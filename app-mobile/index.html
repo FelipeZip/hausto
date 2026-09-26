@@ -203,6 +203,17 @@
   .insight h3 { font-size: var(--fs-heading); font-weight: 700; margin: 12px 0 6px; line-height: 1.3; position: relative; z-index: 1; }
   .insight p { font-size: var(--fs-body-sm); opacity: .85; line-height: 1.45; position: relative; z-index: 1; }
   .insight .actions { display: flex; gap: 10px; margin-top: 16px; position: relative; z-index: 1; }
+  /* card compacto (meia largura), no estilo do card da conta */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 20px 0; }
+  .tile {
+    background: var(--card); border-radius: 22px; padding: 18px;
+    display: flex; flex-direction: column; text-align: left; transition: transform .1s;
+  }
+  .tile:active { transform: scale(.98); }
+  .tile-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .tile-head > svg { width: 19px; height: 19px; stroke: #6B6B76; }
+  .tile b { font-size: var(--fs-heading); font-weight: 700; margin-top: 4px; line-height: 1.25; }
+  .tile .progress { display: block; margin: 12px 0 0; }
   .btn {
     padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: var(--fs-body-sm);
   }
@@ -229,6 +240,95 @@
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; }
   .grid .item { background: var(--card); border-radius: 18px; padding: 18px 8px; text-align: center; font-size: var(--fs-caption); color: var(--muted); }
   .grid .item .ico { display: grid; place-items: center; margin-bottom: 10px; }
+
+  /* ---------- Raio-X: KPIs da fatura ---------- */
+  .rx-big { display: flex; align-items: baseline; gap: 6px; margin-top: 6px; }
+  .rx-big .amount { margin: 0; }
+  .rx-big small { font-size: var(--fs-body); font-weight: 600; color: var(--muted); }
+  .rx-eq { font-size: var(--fs-body-sm); color: var(--muted); margin-top: 4px; }
+  .rx-eq b { color: var(--text); font-weight: 600; }
+  /* barra empilhada: 2px de respiro entre os pedaços, ponta arredondada só no fim */
+  .rx-stack { display: flex; gap: 2px; height: 12px; margin: 18px 0 10px; }
+  .rx-stack i { display: block; min-width: 4px; }
+  .rx-stack i:last-child { border-radius: 0 4px 4px 0; }
+  .rx-leg { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: var(--fs-body-sm); }
+  .rx-leg .sw { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .rx-leg span { flex: 1; color: var(--muted); }
+  .rx-leg b { font-weight: 600; white-space: nowrap; }
+  .rx-leg.total { border-top: 1px solid #EEF0F3; margin-top: 6px; padding-top: 11px; font-size: var(--fs-body); }
+  .rx-leg.total span { color: var(--text); font-weight: 600; }
+  .rx-leg.total b { font-weight: 700; }
+  /* padrões de gasto: carrossel de alertas, um por vez */
+  .rx-pads { display: flex; gap: 12px; overflow-x: auto; margin: 0 -24px; padding: 0 24px; scroll-snap-type: x mandatory; scroll-padding: 0 24px; scrollbar-width: none; }
+  .rx-pads::-webkit-scrollbar { display: none; }
+  .rx-pad { --lv: var(--red); --lv-bg: #FFF1F0; --lv-track: #F8D3D9; flex: 0 0 100%; scroll-snap-align: start; background: var(--lv-bg); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; }
+  .rx-pad.atencao { --lv: #9A6200; --lv-bg: #FFF7E8; --lv-track: #FBE7C6; }
+  .rx-pad.ok { --lv: var(--green); --lv-bg: #EEF8F2; --lv-track: #CFEBDB; }
+  .rx-pad-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .rx-pad-ic { font-size: var(--fs-title); line-height: 1; }
+  .rx-chip { font-size: var(--fs-micro); font-weight: 700; color: var(--lv); background: var(--card); border-radius: 999px; padding: 4px 10px; }
+  .rx-pad-t { font-size: var(--fs-body-lg); font-weight: 700; line-height: 1.35; margin: 12px 0 14px; min-height: 2.7em; }
+  .rx-pad-m { position: relative; height: 8px; border-radius: 4px; background: var(--lv-track); }
+  .rx-pad-m i { display: block; height: 100%; border-radius: 4px; background: var(--lv); }
+  .rx-pad-m em { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--text); border-radius: 1px; }
+  .rx-pad-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: var(--fs-caption); color: var(--muted); }
+  .rx-pad-meta b { color: var(--text); font-weight: 600; }
+  .rx-pad-go { align-self: flex-start; margin-top: 14px; font-size: var(--fs-body-sm); font-weight: 700; color: var(--navy); display: inline-flex; align-items: center; gap: 4px; }
+  .rx-dots { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+  .rx-dots button { width: 8px; height: 8px; border-radius: 4px; background: var(--line); transition: width .2s, background .2s; }
+  .rx-dots button.on { width: 20px; background: var(--navy); }
+  .rx-proj { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 16px; font-size: var(--fs-body); }
+  .rx-proj b { font-size: var(--fs-heading); font-weight: 700; white-space: nowrap; }
+  .rx-note { font-size: var(--fs-caption); color: var(--muted); text-align: right; margin-top: 2px; }
+  .rx-note.good { color: var(--green); }
+  .rx-note.bad { color: var(--red); }
+  /* tiles de número */
+  .rx-kpi .tile-head { margin-bottom: 6px; gap: 6px; }
+  .rx-kpi .tile-head .small { line-height: 1.3; }
+  .rx-kpi b { font-size: var(--fs-title); margin-top: 0; }
+  .rx-kpi b small { font-size: var(--fs-body-sm); font-weight: 600; color: var(--muted); }
+  .rx-sub { font-size: var(--fs-caption); color: var(--muted); margin-top: 4px; line-height: 1.35; }
+  .rx-sub b { font-size: inherit; font-weight: 600; margin: 0; color: var(--text); white-space: nowrap; }
+  .rx-meter { height: 6px; border-radius: 3px; background: #FBE7C6; margin-top: 8px; overflow: hidden; }
+  .rx-meter i { display: block; height: 100%; border-radius: 3px; }
+  /* cards de detalhe */
+  .rx-card .card-head { margin-bottom: 2px; }
+  .rx-cap { font-size: var(--fs-caption); color: var(--muted); margin-bottom: 12px; }
+  .rx-cat { padding: 6px 0; }
+  .rx-cat-top { display: flex; align-items: center; gap: 8px; font-size: var(--fs-body-sm); }
+  .rx-cat-top .nm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rx-cat-top b { font-weight: 600; white-space: nowrap; }
+  .rx-tag { font-size: var(--fs-micro); color: var(--muted); background: #F0F1F4; border-radius: 8px; padding: 1px 7px; flex-shrink: 0; }
+  .rx-bar { display: block; height: 8px; margin-top: 6px; background: #3A4FD8; border-radius: 0 4px 4px 0; }
+  .rx-tip {
+    display: flex; gap: 8px; align-items: flex-start; width: 100%; text-align: left;
+    background: #FFF4EC; border-radius: 14px; padding: 10px 12px; margin-top: 14px;
+    font-size: var(--fs-caption); line-height: 1.45; transition: filter .15s;
+  }
+  .rx-tip:hover, .rx-tip:focus-visible { filter: brightness(.97); outline: none; }
+  .rx-tip svg { color: var(--orange); flex-shrink: 0; margin-top: 3px; }
+  .rx-parc { padding: 10px 0; }
+  .rx-parc + .rx-parc { border-top: 1px solid #EEF0F3; }
+  .rx-parc-top { display: flex; justify-content: space-between; gap: 8px; font-size: var(--fs-body-sm); }
+  .rx-parc-top b { font-weight: 600; white-space: nowrap; }
+  .rx-segs { display: flex; gap: 2px; height: 8px; margin: 8px 0 6px; }
+  .rx-segs i { flex: 1; background: #DDE2FB; }
+  .rx-segs i.on { background: #3A4FD8; }
+  .rx-segs i:first-child { border-radius: 4px 0 0 4px; }
+  .rx-segs i:last-child { border-radius: 0 4px 4px 0; }
+  .rx-parc small { font-size: var(--fs-caption); color: var(--muted); }
+  /* histórico: altura = quanto pagou da fatura; cor = o mesmo, com legenda */
+  .rx-hist { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; height: 64px; border-bottom: 1px solid var(--line); }
+  .rx-hist button { display: flex; align-items: flex-end; height: 100%; border-radius: 4px 4px 0 0; }
+  .rx-hist i { display: block; width: 100%; border-radius: 4px 4px 0 0; transition: opacity .15s; }
+  .rx-hist.pick button:not(.sel) i { opacity: .35; }
+  .rx-hist button:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+  .rx-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; margin-top: 6px; text-align: center; font-size: var(--fs-micro); color: var(--muted); }
+  .rx-hleg { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: var(--fs-caption); color: var(--muted); }
+  .rx-hleg span { display: inline-flex; align-items: center; gap: 6px; }
+  .rx-hleg i { width: 10px; height: 10px; border-radius: 3px; }
+  .rx-hleg b { color: var(--text); }
+  .rx-read { font-size: var(--fs-body-sm); line-height: 1.45; margin-top: 10px; min-height: 2.9em; }
 
   /* ---------- Bottom nav ---------- */
   .nav {
@@ -269,8 +369,8 @@
     padding: 3px 4px 3px 3px; border: 1px solid var(--line); border-radius: 999px;
     font-size: var(--fs-micro); color: var(--text); white-space: nowrap;
   }
-  .of-row.dragging, .shortcuts.dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
-  .of-row.dragging *, .shortcuts.dragging * { pointer-events: none; }
+  .of-row.dragging, .shortcuts.dragging, .quick.dragging, .rx-pads.dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
+  .of-row.dragging *, .shortcuts.dragging *, .quick.dragging *, .rx-pads.dragging * { pointer-events: none; }
   .of-pill:active { background: #F3F4F7; }
   .of-logo { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
   .of-plus { width: 16px; height: 16px; border-radius: 50%; background: #F3F4F7; display: grid; place-items: center; }
@@ -280,7 +380,7 @@
     --tip: var(--orange); --tip-bg: #FFF4EC;
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
     background: var(--tip-bg); border-radius: 999px; padding: 9px 12px; margin: 14px 0 0;
-    font-size: var(--fs-body-sm); color: var(--text);
+    font-size: var(--fs-caption); color: var(--text);
     cursor: pointer; transition: transform .12s, filter .15s;
   }
   .ai-tip:hover, .ai-tip:focus-visible { filter: brightness(.97); outline: none; }
@@ -551,20 +651,115 @@
       </div>
     </section>
 
-    <!-- PRA VOCÊ -->
-    <section class="screen" data-screen="pravoce">
-      <div class="title-row"><h1>Pra você</h1></div>
+    <!-- RAIO-X -->
+    <section class="screen" data-screen="raiox">
+      <div class="title-row"><h1>Raio-X</h1><span class="small">Fatura de outubro</span></div>
+
+      <!-- Simulações -->
       <div class="insight" style="margin-top:0">
         <span class="kicker">Simular imprevisto</span>
         <h3 id="evTitle"></h3>
         <p id="evText"></p>
         <div class="actions"><button class="btn btn-primary" onclick="openChat('imprevisto')">Simular meu imprevisto</button></div>
       </div>
-      <div class="insight">
-        <span class="kicker">Simular objetivo</span>
-        <h3 id="objTitle"></h3>
-        <p id="objText"></p>
-        <div class="actions"><button class="btn btn-primary" onclick="openChat('objetivo')">Posso comprar?</button></div>
+      <div class="tiles">
+        <button class="tile" onclick="openChat('objetivo')">
+          <span class="tile-head">
+            <span class="badge-acc"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></svg></span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+          </span>
+          <span class="small">Simular compra</span>
+          <b>Posso comprar?</b>
+        </button>
+        <button class="tile" onclick="openChat('meta')">
+          <span class="tile-head">
+            <span class="badge-acc" id="metaIco"></span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+          </span>
+          <span class="small" id="metaLbl"></span>
+          <b id="metaPct"></b>
+          <span class="progress"><i id="metaBar"></i></span>
+        </button>
+      </div>
+
+      <!-- Gasto por dia no cartão: o dia a dia que vira a fatura -->
+      <div class="section-title">Seu cartão</div>
+      <div class="card" style="margin-top:0">
+        <div class="card-head">
+          <span class="label">
+            <span class="badge-card"><svg width="20" height="12" viewBox="0 0 20 12"><circle cx="7" cy="6" r="5" fill="#E8352E"/><circle cx="13" cy="6" r="5" fill="#F59E0B" fill-opacity=".9"/></svg></span>
+            Gasto no cartão por dia
+          </span>
+        </div>
+        <div class="rx-big"><span class="amount money explain" id="rxDia" data-explain="diario" data-label="Gasto no cartão por dia" role="button" tabindex="0"></span><small>por dia</small></div>
+        <div class="rx-eq" id="rxEq"></div>
+        <div class="rx-stack" id="rxStack" aria-hidden="true"></div>
+        <div id="rxLegend"></div>
+        <div class="divider"></div>
+        <div class="rx-proj"><span>Próxima fatura</span><b class="money explain" id="rxProx" data-explain="projecao" data-label="Próxima fatura (estimativa)" role="button" tabindex="0"></b></div>
+        <div class="rx-note" id="rxNote" aria-live="polite"></div>
+      </div>
+
+      <!-- Números rápidos -->
+      <div class="tiles">
+        <button class="tile rx-kpi" onclick="openChat('juros_dia')">
+          <span class="tile-head"><span class="small">Juros por dia</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          <b class="money" id="rxJuros"></b>
+          <span class="rx-sub" id="rxJurosSub"></span>
+        </button>
+        <button class="tile rx-kpi" onclick="openChat('livre')">
+          <span class="tile-head"><span class="small">Limite usado</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          <b id="rxLimite"></b>
+          <span class="rx-meter"><i id="rxLimiteBar"></i></span>
+          <span class="rx-sub" id="rxLimiteSub"></span>
+        </button>
+        <button class="tile rx-kpi" style="grid-column: 1 / -1" onclick="openChat('parcelas')">
+          <span class="tile-head"><span class="small">Parcelas deste mês</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></span>
+          <b class="money" id="rxParcMes"></b>
+          <span class="rx-sub" id="rxParcMesSub"></span>
+        </button>
+      </div>
+
+      <!-- Padrões de gasto: alertas comparando cada gasto com a renda -->
+      <div class="card rx-card">
+        <div class="card-head"><span class="label">Seus padrões de gasto</span><span class="small" id="rxPadCount"></span></div>
+        <div class="rx-cap" id="rxPadCap"></div>
+        <div class="rx-pads" id="rxPads"></div>
+        <div class="rx-dots" id="rxDots"></div>
+      </div>
+
+      <!-- Detalhes da fatura -->
+      <div class="section-title">Detalhes da fatura</div>
+      <div class="card rx-card" style="margin-top:0">
+        <button class="card-head" onclick="openChat('categorias')">
+          <span class="label">Onde foi o dinheiro do cartão</span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="rx-cap">Compras desta fatura, sem as parcelas</div>
+        <div id="rxCats"></div>
+        <button class="rx-tip" onclick="openChat('categorias')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg><span id="rxDica"></span></button>
+      </div>
+
+      <div class="card rx-card">
+        <button class="card-head" onclick="openChat('parcelas')">
+          <span class="label">Compras parceladas</span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="rx-cap">Parcelas já cobradas, contando a deste mês</div>
+        <div id="rxParcList"></div>
+        <button class="rx-tip" onclick="openChat('parcelas')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg><span id="rxAlivio"></span></button>
+      </div>
+
+      <div class="card rx-card">
+        <button class="card-head" onclick="openChat('historico')">
+          <span class="label">Como pagou as faturas em 2025</span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="rx-cap" id="rxHistCap"></div>
+        <div class="rx-hist" id="rxHist"></div>
+        <div class="rx-months" aria-hidden="true"><span>J</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span>D</span></div>
+        <div class="rx-hleg" id="rxHistLeg"></div>
+        <div class="rx-read" id="rxRead" aria-live="polite"></div>
       </div>
     </section>
 
@@ -582,9 +777,9 @@
   <!-- Navegação inferior -->
   <nav class="nav" id="nav">
     <button class="active" data-go="home"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linejoin="round"><path d="M4 10l8-6 8 6v10H4z"/><path d="M10 20v-5h4v5"/></svg></span><span class="lbl">Início</span></button>
+    <button data-go="raiox"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/></svg></span><span class="lbl">Raio-X</span></button>
     <button data-go="extrato"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></span><span class="lbl">Extrato</span></button>
     <button data-go="pagamentos"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M4 8h15l-3-3M20 16H5l3 3"/></svg></span><span class="lbl">Pagamentos</span></button>
-    <button data-go="pravoce"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="9" width="16" height="11" rx="1"/><path d="M3 9h18M12 9v11M12 9c-1.5-4-6-4-5-1.5M12 9c1.5-4 6-4 5-1.5"/></svg></span><span class="lbl">Pra você</span></button>
     <button data-go="menu"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg></span><span class="lbl">Menu</span></button>
   </nav>
 
@@ -681,6 +876,24 @@
       final: '2214', fatura: 1240, venc: '10/out', limite: 1800, sugerido: 420,
       insight: { titulo: 'Dá para pagar parte da fatura sem faltar para a casa', antes: 'Até o benefício cair, dia 3, a senhora pode pagar', depois: 'da fatura.' },
       hist: '8 de 12', histNote: 'Nos meses em que pagou tudo, teve ajuda dos filhos ou o 13º.',
+      // Raio-X: composição da fatura de outubro (compras + parcelas + resto da fatura passada = R$ 1.240)
+      raiox: {
+        // padrões de gasto: [ícone, gasto, valor no mês, % recomendado da renda, título, dicas]
+        renda: { mes: 1520, nome: 'do benefício' },
+        padroes: [
+          ['💳', 'Resto da fatura passada', 410, 10, 'O resto da fatura passada leva {pct} do benefício',
+            ['Pagar o valor sugerido todo mês faz esse resto cair.', 'Evitar novas compras parceladas até a geladeira acabar, em janeiro.']],
+          ['🏠', 'Aluguel', 470, 30, 'O aluguel consome {pct} do benefício',
+            ['Na renovação do contrato, dá para pedir um reajuste menor.', 'Veja se a senhora tem direito à Tarifa Social: desconto na conta de luz.']],
+          ['💊', 'Farmácia e remédios', 290, 15, 'Os remédios levam {pct} do benefício',
+            ['Pergunte na Farmácia Popular se os outros remédios estão na lista. Alguns saem de graça.', 'O genérico costuma custar bem menos. Peça ao farmacêutico.']]
+        ],
+        compras: [['🛒', 'Mercado', 320], ['💊', 'Farmácia', 180]],
+        parcelas: [['Geladeira', 210, 3, 6], ['Celular do neto', 120, 5, 10]],
+        anterior: 410, divPlano: 918, plano: 'vai pagar R$ 420 agora',
+        hist: 'PTPPTMMTMMMT', // jan→dez: T = tudo, P = uma parte, M = mínimo
+        dica: 'O resto da fatura passada, com juros, é R$ 410. Pesa mais que o mercado do mês.'
+      },
       evento: { titulo: 'O médico passou um remédio novo', texto: 'Custa R$ 90 por mês. Veja como fica a conta da fatura.',
         chip: 'Um remédio novo (R$ 90)', minimo: 186, depois: 0,
         pergunta: 'Aconteceu algum gasto que a senhora não esperava? Escreva aqui embaixo o que foi e quanto custa. Por exemplo: “dentista, 150”.',
@@ -689,6 +902,8 @@
       objetivo: { titulo: 'Quer comprar alguma coisa?', texto: 'Um presente, um móvel, um aparelho. Eu vejo se cabe no seu mês sem faltar para a casa.',
         folga: 50, exemplo: 'Presente da neta, 150', chip: 'Presente da neta (R$ 150)',
         pergunta: 'O que a senhora quer comprar e quanto custa? Escreva aqui embaixo. Por exemplo: “TV nova, 1.200”.' },
+      // meta de longo prazo: quanto já guardou (o medo dela é ficar sem remédio)
+      meta: { rotulo: 'Reserva', nome: 'reserva para imprevistos', para: 'a reserva', icone: 'reserva', alvo: 1000, guardado: 350 },
       extrato: [
         ['02 de outubro', [['🏠', 'Aluguel (minha parte)', 'Pix', -470], ['💼', 'Benefício INSS', 'Consignado de R$ 530 já descontado', 1520]]],
         ['10 de setembro', [['💳', 'Pagamento da fatura', 'Só o mínimo', -172.5]]],
@@ -781,6 +996,23 @@
       final: '5530', fatura: 1980, venc: '12/out', limite: 3000, sugerido: 370,
       insight: { titulo: 'Seu salário caiu hoje. Dá pra pagar a fatura em 2 vezes', antes: 'Pague', depois: 'agora e mais R$ 550 no dia 20.' },
       hist: '6 de 12', histNote: 'Aconteceu nos meses com gasto extra: material escolar e férias do Davi.',
+      raiox: {
+        renda: { mes: 2500, nome: 'do salário' },
+        padroes: [
+          ['🏠', 'Aluguel', 800, 30, 'Seu aluguel está consumindo {pct} do seu salário',
+            ['Na renovação do contrato, tente negociar o reajuste.', 'Dividir internet ou streaming com alguém alivia as contas fixas.']],
+          ['🛵', 'Delivery e transporte por app', 300, 10, 'Você está gastando muito com delivery e app',
+            ['Cozinhar em dobro no domingo e congelar marmitas para a semana.', 'Cortar metade dos pedidos devolve uns R$ 150 por mês.', 'Retirar o pedido no local costuma sair sem taxa de entrega.']],
+          ['📺', 'Streaming', 40, 3, 'Streaming está dentro do esperado',
+            ['Se tiver mais de um serviço, dá para alternar um por mês.']]
+        ],
+        compras: [['🛒', 'Mercado', 350], ['👕', 'Roupas da escola', 240], ['🛵', 'Delivery', 180], ['🧾', 'Outros', 160],
+                  ['🚗', 'Transporte por app', 120], ['💊', 'Farmácia', 90], ['📺', 'Streaming', 40]],
+        parcelas: [['TV', 190, 6, 10], ['Celular', 150, 8, 12]],
+        anterior: 460, divPlano: 1205, plano: 'vai pagar R$ 370 agora e R$ 550 no dia 20',
+        hist: 'PMPTTTPTPPTT',
+        dica: 'Delivery e transporte por app somaram R$ 300. Dá uns R$ 10 por dia.'
+      },
       evento: { titulo: 'A geladeira quebrou', texto: 'O conserto custa R$ 70. Veja como fica a conta da fatura.',
         chip: 'A geladeira quebrou (R$ 70)', minimo: 297, depois: 550,
         pergunta: 'Aconteceu algum gasto fora do previsto? Me conta aqui embaixo o que foi e quanto custa. Por exemplo: “dentista, 150”.',
@@ -788,6 +1020,7 @@
       objetivo: { titulo: 'Tem alguma compra em mente?', texto: 'Me conta o que é e quanto custa. Eu vejo se dá pra comprar agora ou quanto tempo leva pra juntar.',
         folga: 100, exemplo: 'Bicicleta do Davi, 450', chip: 'Bicicleta do Davi (R$ 450)',
         pergunta: 'O que você quer comprar e quanto custa? Me conta aqui embaixo. Por exemplo: “celular novo, 1.200”.' },
+      meta: { rotulo: 'Casa', nome: 'entrada da casa própria', para: 'a casa', icone: 'casa', alvo: 10000, guardado: 3200 },
       extrato: [
         ['Hoje · 07/10', [['💼', 'Salário', 'Crédito em conta', 1500]]],
         ['20 de setembro', [['💼', 'Adiantamento', 'Crédito em conta', 1000], ['💳', 'Pagamento da fatura', 'Parcial', -900]]],
@@ -886,6 +1119,23 @@
       final: '8807', fatura: 2760, venc: '18/out', limite: 4500, sugerido: 680,
       insight: { titulo: 'Fiz a conta só com o que é certo', antes: 'Dá pra pagar', depois: 'da fatura sem apertar até dia 5.' },
       hist: '7 de 12', histNote: 'Acompanha o trabalho: no verão paga tudo, no inverno aperta.',
+      raiox: {
+        renda: { mes: 2283, nome: 'da renda média' },
+        padroes: [
+          ['🧰', 'Material de trabalho no cartão pessoal', 980, 25, 'O material de trabalho levou {pct} da renda, no cartão pessoal',
+            ['Cobrar o material do cliente antes do serviço, ou incluir no orçamento.', 'Uma conta só do MEI mostra o que é da empresa e o que é seu.']],
+          ['🏠', 'Aluguel', 750, 30, 'Seu aluguel está consumindo {pct} da sua renda',
+            ['No inverno a renda cai. Vale guardar um pouco do aluguel no verão.', 'Na renovação do contrato, tente negociar o reajuste.']],
+          ['🍔', 'Lanches e restaurante', 210, 8, 'Você está gastando muito com restaurante',
+            ['Levar marmita nos dias de serviço longe de casa.', 'Deixar água e lanche no carro evita parar em lanchonete.']]
+        ],
+        compras: [['🧰', 'Material de trabalho', 980, 'trabalho'], ['⛽', 'Combustível', 420, 'trabalho'], ['🛒', 'Mercado', 380, 'pessoal'],
+                  ['🍔', 'Lanches e restaurante', 210, 'misto'], ['📱', 'Plano de celular', 60, 'misto']],
+        parcelas: [['Bomba de vácuo', 170, 4, 8]],
+        anterior: 540, divPlano: 2330, plano: 'vai pagar R$ 680 agora',
+        hist: 'TTTPPMMPTPMT',
+        dica: 'R$ 1.570 desta fatura são do trabalho: material, combustível e a bomba. Separar do pessoal mostra quanto sobra de verdade.'
+      },
       evento: { titulo: 'O pneu do carro furou', texto: 'A troca custa R$ 220. Sem carro não tem trabalho. Veja como fica a conta.',
         chip: 'O pneu furou (R$ 220)', minimo: 414, depois: 0,
         pergunta: 'Pintou algum gasto fora do previsto? Escreve aqui embaixo o que foi e quanto custa. Tipo: “peça do carro, 300”.',
@@ -893,6 +1143,7 @@
       objetivo: { titulo: 'Pensando em comprar algo?', texto: 'Ferramenta, peça, o que for. Eu vejo se cabe agora contando só com o que é certo.',
         folga: 150, exemplo: 'Furadeira nova, 600', chip: 'Furadeira nova (R$ 600)',
         pergunta: 'O que você quer comprar e quanto custa? Escreve aqui embaixo. Tipo: “furadeira, 600”.' },
+      meta: { rotulo: 'Carro', nome: 'entrada do carro novo', para: 'o carro', icone: 'carro', alvo: 8000, guardado: 2000 },
       extrato: [
         ['10 de outubro', [['🔧', 'Pix recebido · Manutenção', 'Cliente', 450], ['📦', 'Material de refrigeração', 'Débito', -310]]],
         ['05 de outubro', [['🏠', 'Aluguel (metade)', 'Pix', -750], ['👧', 'Pensão alimentícia', 'Pix', -400]]],
@@ -998,9 +1249,47 @@
         ask: 'compra',
         opts: [[p.objetivo.chip, '__compra_ex'], ['Agora não', 'fim']]
       }
-    }, p.flow);
+    }, metaFlow(p), rxFlow(p), padraoFlow(p), p.flow);
     f.naoentendi = { say: ['Ainda não sei responder isso por texto.', 'Pode escolher uma das opções abaixo:'], opts: p.menuOpts };
     return f;
+  }
+
+  // Meta: quanto já guardou, quanto falta e quanto tempo leva com a sobra do mês
+  const metaPct = m => Math.round(m.guardado / m.alvo * 100);
+  function prazo(meses) {
+    if (meses <= 1) return '1 mês';
+    if (meses < 12) return meses + ' meses';
+    const anos = n => n + (n > 1 ? ' anos' : ' ano'), a = Math.floor(meses / 12), r = meses % 12;
+    if (r <= 1) return anos(a);
+    if (r >= 11) return anos(a + 1);
+    if (r >= 5 && r <= 7) return anos(a) + ' e meio';
+    return anos(a) + ' e ' + r + ' meses';
+  }
+  function metaFlow(p) {
+    const M = p.meta, rs = v => fmt(v).replace(',00', '');
+    const falta = M.alvo - M.guardado, porMes = p.objetivo.folga;
+    // juros do mês sobre o que fica sem pagar da fatura (mesma taxa das outras simulações)
+    const juros = Math.round((p.fatura - p.sugerido) * 0.12 / 10) * 10;
+    const sr = p.id === 'maria', fecho = sr ? ['Ouvir em áudio', '__audio'] : ['Agora não', 'fim'];
+    return {
+      meta: {
+        say: ['Sua meta: <b>' + M.nome + '</b>, de ' + rs(M.alvo) + '.',
+              (sr ? 'A senhora' : 'Você') + ' já guardou <b>' + rs(M.guardado) + '</b>. É <b>' + metaPct(M) + '%</b> do caminho.',
+              'Faltam ' + rs(falta) + '. Guardando ' + rs(porMes) + ' por mês, que é o que sobra depois das contas e da fatura, leva mais ou menos <b>' + prazo(Math.ceil(falta / porMes)) + '</b>.'],
+        opts: [['Como chegar mais rápido?', 'meta_rapido'], ['Me lembra de guardar', 'meta_lembrete'], fecho]
+      },
+      meta_rapido: {
+        say: ['O que mais atrasa a meta são os juros do cartão: uns <b>' + rs(juros) + '</b> por mês.',
+              card('good', '✅ Quitar a fatura primeiro', 'Sem juros, dá para guardar uns ' + rs(porMes + juros) + ' por mês, e não ' + rs(porMes) + '.'),
+              card('warn', '⚠️ Guardar só a sobra', 'A meta leva ' + prazo(Math.ceil(falta / porMes)) + ', e os juros continuam.'),
+              p.evento.decisao],
+        opts: [['Minha fatura', 'fatura'], ['Me lembra de guardar', 'meta_lembrete'], fecho]
+      },
+      meta_lembrete: {
+        say: ['Combinado. Quando o dinheiro cair, eu lembro de separar <b>' + rs(porMes) + '</b> para ' + M.para + '.'],
+        next: 'fim'
+      }
+    };
   }
 
   let P = null, flow = {};
@@ -1259,10 +1548,17 @@
     if (/senha|link|golpe/.test(s)) return 'seguro';
     if (/rem[eé]dio|geladeira|pneu|imprevisto|conta nova|gasto novo/.test(s)) return 'evento';
     if (/quanto (posso|d[aá])|sugerid|pagar/.test(s)) return 'sugerido';
+    if (/juros/.test(s)) return 'juros_dia';
+    if (/aluguel|economizar|restaurante|padr[aã]o/.test(s)) return 'padrao_0';
+    if (/por dia|di[aá]ri/.test(s)) return 'diario';
+    if (/\bparcelas?\b|parcelad/.test(s)) return 'parcelas';
+    if (/pr[oó]xima fatura|m[eê]s que vem|ritmo/.test(s)) return 'projecao';
+    if (/onde (gastei|gasto|foi)|categoria|delivery/.test(s)) return 'categorias';
     if (/fatura|m[ií]nimo|vence/.test(s)) return 'fatura';
     if (/limite|cart[aã]o/.test(s)) return 'livre';
     if (/sal[aá]rio|benef[ií]cio|adiantamento|servi[cç]o|renda|inss/.test(s)) return 'renda';
     if (/hist[oó]rico|2025/.test(s)) return 'historico';
+    if (/\bmeta\b|guardei|guardad|juntar/.test(s)) return 'meta';
     if (/saldo|conta/.test(s)) return 'saldo';
     return null;
   }
@@ -1289,7 +1585,7 @@
       run('__gasto'); return;
     }
     const nome = gastoDesc ? gastoDesc.charAt(0).toUpperCase() + gastoDesc.slice(1) : 'Esse gasto';
-    const E = P.evento, r10 = v => Math.round(v / 10) * 10;
+    const E = P.evento;
     const antes = P.sugerido, livre = antes - valor, pagar = Math.max(livre, E.minimo);
     const divida = r10((P.fatura - pagar - E.depois) * 1.12);
     const linhas = ['<li>Dá para pagar agora: de ' + fmt(antes) + ' para <b>' + fmt(pagar) + '</b></li>'];
@@ -1418,6 +1714,11 @@
 
   // ---- aplica a persona no app ----
   const $id = id => document.getElementById(id);
+  const META_ICO = {
+    casa: '<path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
+    carro: '<path d="M5 17H3.5v-4.5L6 7h12l2.5 5.5V17H19"/><path d="M9 17h6M4 12.5h16"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>',
+    reserva: '<path d="M12 3l7 3v5.5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5V6z"/><path d="M9 12l2 2 4-4"/>'
+  };
   function setVal(el, text) {
     el.dataset.v = text;
     el.textContent = hidden ? '••••' : text;
@@ -1451,8 +1752,12 @@
 
     $id('evTitle').textContent = P.evento.titulo;
     $id('evText').textContent = P.evento.texto;
-    $id('objTitle').textContent = P.objetivo.titulo;
-    $id('objText').textContent = P.objetivo.texto;
+
+    $id('metaIco').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' + META_ICO[P.meta.icone] + '</svg>';
+    $id('metaLbl').textContent = 'Meta: ' + P.meta.rotulo.toLowerCase();
+    $id('metaPct').textContent = metaPct(P.meta) + '% guardado';
+    $id('metaBar').style.width = metaPct(P.meta) + '%';
+    renderRaioX();
     go('home');
   }
 
@@ -1471,6 +1776,228 @@
   }
   // Para testar o cenário positivo no console: simularSaldo(3500)
   window.simularSaldo = v => { P.saldo = v; setVal($id('vSaldo'), fmt(v)); renderAiTip(); };
+
+  // ---- Raio-X: KPIs da fatura, todos tirados da composição dela ----
+  // Mesmas premissas do Hausto_Personas.md: rotativo de 12% ao mês e mês de 30 dias.
+  const JUROS_AM = 0.12, DIAS = 30, MES_FATURA = 9; // fatura de outubro
+  const MES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  const RX_COR = ['#3A4FD8', '#8FA0F4', '#F4621F']; // compras, parcelas, resto da fatura passada
+  // histórico: legenda, frase, cor e altura da coluna (quanto pagou da fatura)
+  const HIST = { T: ['Tudo', 'pagou tudo', '#0A7F3F', 100], P: ['Uma parte', 'pagou uma parte', '#D98E04', 55], M: ['Só o mínimo', 'pagou só o mínimo', '#C8102E', 18] };
+  const METER = [[80, '#C8102E', '#F8D3D9'], [50, '#D98E04', '#FBE7C6'], [0, '#0A7F3F', '#CFEBDB']];
+  const fmt0 = v => (v < 0 ? '-' : '') + 'R$ ' + Math.round(Math.abs(v)).toLocaleString('pt-BR');
+  const r10 = v => Math.round(v / 10) * 10;
+  // valor dentro de um texto, respeitando o "ocultar valores"
+  const valHTML = txt => '<b class="money' + (hidden ? ' hidden-val' : '') + '" data-v="' + txt + '">' + (hidden ? '••••' : txt) + '</b>';
+
+  function rx(p) {
+    const R = p.raiox, soma = (a, i) => a.reduce((s, x) => s + x[i], 0);
+    const compras = soma(R.compras, 2), parcelas = soma(R.parcelas, 1);
+    // parcela n de total na fatura de outubro: a última vem em outubro + (total − n)
+    const parc = R.parcelas.map(([nome, v, n, total]) => ({ nome, v, n, total, ultima: MES_FATURA + total - n }));
+    const seguem = parc.filter(x => x.n < x.total).reduce((s, x) => s + x.v, 0);
+    const resto = p.fatura - p.sugerido;
+    return {
+      compras, parcelas, parc, seguem, diario: compras / DIAS,
+      jurosDia: resto * JUROS_AM / DIAS, jurosMes: resto * JUROS_AM,
+      // próxima fatura = o que fica desta (com juros) + compras do mês + parcelas que continuam
+      proxima: gastoMes => r10(R.divPlano + gastoMes + seguem)
+    };
+  }
+  // "Em fevereiro, a fatura fica R$ 210 mais leve. Em abril, mais R$ 120."
+  function alivio(X) {
+    const por = {};
+    X.parc.forEach(x => { por[x.ultima + 1] = (por[x.ultima + 1] || 0) + x.v; });
+    return Object.keys(por).map(Number).sort((a, b) => a - b).map((m, i) =>
+      'Em ' + MES[m % 12] + (i ? ', mais ' + fmt0(por[m]) + '.' : ', a fatura fica ' + fmt0(por[m]) + ' mais leve.')).join(' ');
+  }
+
+  // Respostas do Hausto para os números do Raio-X
+  function rxFlow(p) {
+    const R = p.raiox, X = rx(p), sr = p.id === 'maria';
+    const au = sr ? [['Ouvir em áudio', '__audio']] : [], ok = [['Entendi', 'fim']];
+    const top = R.compras.slice().sort((a, b) => b[2] - a[2]).slice(0, 3);
+    return {
+      diario: {
+        say: [(sr ? 'A senhora' : 'Você') + ' gasta uns <b>' + fmt0(X.diario) + ' por dia</b> no cartão.',
+              'Em 30 dias, isso dá uns <b>' + fmt0(X.compras) + '</b> em compras.',
+              'A fatura de ' + fmt0(p.fatura) + ' ainda tem ' + fmt0(X.parcelas) + ' de parcelas e ' + fmt0(R.anterior) + ' que ficaram da fatura passada, com juros.'],
+        opts: [['E a próxima fatura?', 'projecao'], ['Onde gastei mais?', 'categorias']].concat(au, ok)
+      },
+      juros_dia: {
+        say: ['O que fica sem pagar gera uns <b>' + fmt0(X.jurosDia) + ' de juros por dia</b>.',
+              'Pagando ' + fmt0(p.sugerido) + ', ficam ' + fmt0(p.fatura - p.sugerido) + ' sem pagar. No mês, dá uns <b>' + fmt0(r10(X.jurosMes)) + '</b> de juros.',
+              'Quanto antes pagar, menos juros.'],
+        opts: [p.menuOpts[1]].concat(p.flow.porque2 ? [['Por que em 2 vezes?', 'porque2']] : [], au, ok)
+      },
+      categorias: {
+        say: ['Nesta fatura, as compras que mais pesaram:',
+              '<ul>' + top.map(([, nome, v]) => '<li>' + nome + ': <b>' + fmt0(v) + '</b></li>').join('') + '</ul>',
+              R.dica],
+        opts: [['E a próxima fatura?', 'projecao']].concat(au, ok)
+      },
+      parcelas: {
+        say: [(sr ? 'A senhora' : 'Você') + ' tem <b>' + fmt0(X.parcelas) + ' de parcelas</b> por mês.',
+              '<ul>' + X.parc.map(x => '<li>' + x.nome + ': ' + x.n + ' de ' + x.total + '. A última vem em ' + MES[x.ultima % 12] + '.</li>').join('') + '</ul>',
+              alivio(X)],
+        opts: [['E a próxima fatura?', 'projecao']].concat(au, ok)
+      }
+    };
+  }
+  function projecaoNode(prox) {
+    const R = P.raiox, X = rx(P), sr = P.id === 'maria';
+    const say = ['Se o ritmo continuar, a próxima fatura vem uns <b>' + fmt0(prox) + '</b>.',
+      '<ul><li>O que fica desta fatura, com juros: <b>' + fmt0(R.divPlano) + '</b></li><li>Compras do mês: <b>' + fmt0(X.compras) + '</b></li><li>Parcelas: <b>' + fmt0(X.seguem) + '</b></li></ul>',
+      'Contei que ' + (sr ? 'a senhora' : 'você') + ' ' + R.plano + '.'];
+    if (prox > P.limite) say.push('Isso passa do limite do cartão, de ' + fmt0(P.limite) + '.');
+    say.push('Cada R$ 5 a menos por dia tira uns <b>R$ 150</b> da fatura.');
+    return { say, opts: [['Onde gastei mais?', 'categorias'], P.menuOpts[1]].concat(sr ? [['Ouvir em áudio', '__audio']] : [], [['Entendi', 'fim']]) };
+  }
+
+  function renderRaioX() {
+    const R = P.raiox, X = rx(P);
+
+    // gasto por dia e de onde vem a fatura
+    setVal($id('rxDia'), fmt0(X.diario));
+    $id('rxEq').innerHTML = valHTML(fmt0(X.diario)) + ' × 30 dias ≈ ' + valHTML(fmt0(X.compras)) + ' em compras';
+    const partes = [['Compras do mês', X.compras], ['Parcelas', X.parcelas], ['Fatura passada + juros', R.anterior]];
+    $id('rxStack').innerHTML = partes.map(([, v], i) => '<i style="flex:' + v + ' 1 0;background:' + RX_COR[i] + '"></i>').join('');
+    $id('rxLegend').innerHTML = partes.map(([nome, v], i) =>
+      '<div class="rx-leg"><i class="sw" style="background:' + RX_COR[i] + '"></i><span>' + nome + '</span>' + valHTML(fmt0(v)) + '</div>').join('') +
+      '<div class="rx-leg total"><span>Fatura aberta</span>' + valHTML(fmt0(P.fatura)) + '</div>';
+    renderProjecao();
+
+    // números rápidos
+    setVal($id('rxJuros'), fmt0(X.jurosDia));
+    $id('rxJurosSub').innerHTML = 'Uns ' + valHTML(fmt0(r10(X.jurosMes))) + ' no mês, pagando ' + valHTML(fmt0(P.sugerido));
+    const pct = Math.round(P.fatura / P.limite * 100), [, cor, trilho] = METER.find(([min]) => pct >= min);
+    $id('rxLimite').textContent = pct + '%';
+    Object.assign($id('rxLimiteBar').style, { width: pct + '%', background: cor });
+    $id('rxLimiteBar').parentNode.style.background = trilho;
+    $id('rxLimiteSub').innerHTML = valHTML(fmt0(P.limite - P.fatura)) + ' ainda livres';
+    // parcelas que vieram na fatura deste mês
+    setVal($id('rxParcMes'), fmt0(X.parcelas));
+    $id('rxParcMesSub').innerHTML = 'Na fatura de ' + MES[MES_FATURA] + ': ' +
+      X.parc.map(x => x.nome + ' (' + x.n + ' de ' + x.total + ')').join(', ').replace(/, ([^,]*)$/, ' e $1');
+    renderPadroes();
+
+    // onde foi o dinheiro: uma cor só, o comprimento já diz quem pesa mais
+    const cats = R.compras.slice().sort((a, b) => b[2] - a[2]), max = cats[0][2];
+    $id('rxCats').innerHTML = cats.map(([ic, nome, v, tipo]) =>
+      '<div class="rx-cat"><div class="rx-cat-top"><span aria-hidden="true">' + ic + '</span><span class="nm">' + nome + '</span>' +
+      (tipo ? '<span class="rx-tag">' + tipo + '</span>' : '') + valHTML(fmt0(v)) + '</div>' +
+      '<i class="rx-bar" style="width:' + (v / max * 100) + '%"></i></div>').join('');
+    $id('rxDica').textContent = R.dica;
+
+    // parcelas: um tracinho por parcela, cheios os que já vieram
+    $id('rxParcList').innerHTML = X.parc.map(x =>
+      '<div class="rx-parc"><div class="rx-parc-top"><span>' + x.nome + '</span><b>' + x.n + ' de ' + x.total + '</b></div>' +
+      '<div class="rx-segs" aria-hidden="true">' + Array.from({ length: x.total }, (_, i) => '<i' + (i < x.n ? ' class="on"' : '') + '></i>').join('') + '</div>' +
+      '<small>' + valHTML(fmt0(x.v)) + ' por mês · a última vem em ' + MES[x.ultima % 12] + '</small></div>').join('');
+    $id('rxAlivio').textContent = alivio(X);
+
+    // histórico de 2025
+    const conta = { T: 0, P: 0, M: 0 };
+    [...R.hist].forEach(k => conta[k]++);
+    $id('rxHistCap').textContent = 'Parcial ou mínimo em ' + P.hist + ' faturas';
+    $id('rxHist').classList.remove('pick');
+    $id('rxHist').innerHTML = [...R.hist].map((k, i) => {
+      const [, frase, c, h] = HIST[k], rot = MES[i] + ': ' + frase;
+      return '<button type="button" data-i="' + i + '" aria-label="' + rot + '" title="' + rot + '"><i style="height:' + h + '%;background:' + c + '"></i></button>';
+    }).join('');
+    $id('rxHistLeg').innerHTML = Object.keys(HIST).map(k => '<span><i style="background:' + HIST[k][2] + '"></i>' + HIST[k][0] + ' <b>' + conta[k] + '</b></span>').join('');
+    $id('rxRead').textContent = P.histNote;
+  }
+
+  // ---- Padrões de gasto: cada gasto comparado com a renda do mês ----
+  // Acima do recomendado → vermelho; a partir de 80% dele → atenção; abaixo → dentro do esperado
+  const NIVEL = { alto: 'Acima do recomendado', atencao: 'Atenção', ok: 'Dentro do esperado' };
+  function padroes(p) {
+    const R = p.raiox;
+    return R.padroes.map(([ic, nome, valor, ref, titulo, dicas]) => {
+      const pct = Math.round(valor / R.renda.mes * 100);
+      const nivel = pct > ref ? 'alto' : pct >= ref * 0.8 ? 'atencao' : 'ok';
+      return { ic, nome, valor, ref, pct, nivel, dicas, titulo: titulo.replace('{pct}', pct + '%') };
+    }).sort((a, b) => b.pct / b.ref - a.pct / a.ref); // o mais fora do recomendado primeiro
+  }
+  function padraoFlow(p) {
+    const R = p.raiox, sr = p.id === 'maria', lista = padroes(p), f = {};
+    lista.forEach((x, i) => {
+      f['padrao_' + i] = {
+        say: [x.titulo + '.',
+              x.nome + ': <b>' + fmt0(x.valor) + ' por mês</b>, ' + x.pct + '% ' + R.renda.nome + '. O recomendado é até ' + x.ref + '% (uns ' + fmt0(R.renda.mes * x.ref / 100) + ').',
+              x.nivel === 'ok' ? 'Está bom. Uma ideia para manter assim:' : 'Algumas formas de economizar:',
+              '<ul>' + x.dicas.map(d => '<li>' + d + '</li>').join('') + '</ul>',
+              p.evento.decisao],
+        opts: (lista.length > 1 ? [['Próximo gasto', 'padrao_' + (i + 1) % lista.length]] : []).concat(sr ? [['Ouvir em áudio', '__audio']] : [], [['Entendi', 'fim']])
+      };
+    });
+    return f;
+  }
+  let padTimer = null;
+  const padPasso = row => row.clientWidth - 48 + 12; // largura do slide + espaço entre eles
+  function padIr(i) { const row = $id('rxPads'); row.scrollTo({ left: i * padPasso(row), behavior: 'smooth' }); }
+  function renderPadroes() {
+    const R = P.raiox, lista = padroes(P), row = $id('rxPads');
+    const alertas = lista.filter(x => x.nivel !== 'ok').length;
+    $id('rxPadCount').textContent = alertas ? alertas + (alertas > 1 ? ' alertas' : ' alerta') : 'Tudo em dia';
+    $id('rxPadCap').innerHTML = 'Em relação ' + (P.id === 'maria' ? 'ao benefício' : 'à renda') + ' de ' + valHTML(fmt0(R.renda.mes));
+    // régua de 0 a 50% da renda, com a marca do recomendado
+    const pos = v => Math.min(v, 50) * 2 + '%';
+    row.innerHTML = lista.map((x, i) =>
+      '<div class="rx-pad ' + x.nivel + '" role="group" aria-label="' + (i + 1) + ' de ' + lista.length + '">' +
+        '<div class="rx-pad-top"><span class="rx-pad-ic" aria-hidden="true">' + x.ic + '</span><span class="rx-chip">' + NIVEL[x.nivel] + '</span></div>' +
+        '<b class="rx-pad-t">' + x.titulo + '</b>' +
+        '<div class="rx-pad-m" aria-hidden="true"><i style="width:' + pos(x.pct) + '"></i><em style="left:' + pos(x.ref) + '"></em></div>' +
+        '<div class="rx-pad-meta"><span>' + valHTML(fmt0(x.valor)) + '/mês · <b>' + x.pct + '%</b></span><span>Ideal: até ' + x.ref + '%</span></div>' +
+        '<button type="button" class="rx-pad-go" onclick="openChat(\'padrao_' + i + '\')">' + (x.nivel === 'ok' ? 'Ver dica' : 'Ver como economizar') +
+          ' <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>' +
+      '</div>').join('');
+    $id('rxDots').innerHTML = lista.map((_, i) => '<button type="button" aria-label="Ver alerta ' + (i + 1) + '"' + (i ? '' : ' class="on"') + '></button>').join('');
+    row.scrollLeft = 0;
+    // passa sozinho a cada 6 s até a pessoa mexer
+    clearInterval(padTimer);
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches && lista.length > 1)
+      padTimer = setInterval(() => {
+        if (!row.offsetParent || phone.classList.contains('open')) return;
+        padIr((Math.round(row.scrollLeft / padPasso(row)) + 1) % lista.length);
+      }, 6000);
+  }
+  (() => {
+    const row = $id('rxPads'), dots = $id('rxDots');
+    const parar = () => { clearInterval(padTimer); padTimer = null; };
+    row.addEventListener('scroll', () => {
+      const i = Math.round(row.scrollLeft / padPasso(row));
+      dots.querySelectorAll('button').forEach((d, k) => d.classList.toggle('on', k === i));
+    }, { passive: true });
+    ['pointerdown', 'wheel', 'touchstart'].forEach(ev => row.addEventListener(ev, parar, { passive: true }));
+    dots.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      parar(); padIr([...dots.children].indexOf(b));
+    });
+  })();
+
+  // próxima fatura no ritmo de hoje, com alerta de limite
+  function renderProjecao() {
+    const X = rx(P), prox = X.proxima(X.compras);
+    setVal($id('rxProx'), 'uns ' + fmt0(prox));
+    const alerta = prox > P.limite ? 'Passa do limite de ' : prox >= P.limite * 0.9 ? 'Quase no limite de ' : '';
+    $id('rxNote').innerHTML = alerta ? alerta + valHTML(fmt0(P.limite)) : 'Se o ritmo de gastos continuar';
+    $id('rxNote').className = 'rx-note' + (alerta ? ' bad' : '');
+    flow.projecao = projecaoNode(prox);
+  }
+
+  // histórico: tocar (ou passar o mouse) numa coluna mostra o mês
+  (() => {
+    const h = $id('rxHist');
+    const show = e => {
+      const b = e.target.closest('button'); if (!b) return;
+      const i = +b.dataset.i, nome = MES[i].charAt(0).toUpperCase() + MES[i].slice(1);
+      h.classList.add('pick'); h.querySelectorAll('button').forEach(x => x.classList.toggle('sel', x === b));
+      $id('rxRead').textContent = nome + ': ' + HIST[P.raiox.hist[i]][1] + '.';
+    };
+    ['click', 'mouseover', 'focusin'].forEach(ev => h.addEventListener(ev, show));
+  })();
 
   // ---- onboarding: escolha da persona ----
   let pick = null;
@@ -1491,7 +2018,7 @@
     $id('onbGo').textContent = 'Entrar como ' + PERSONAS[pick].curto;
   });
   // carrosséis horizontais: no toque já rolam; no mouse, arrastar e roda do mouse
-  document.querySelectorAll('.of-row, .shortcuts').forEach(row => {
+  document.querySelectorAll('.of-row, .shortcuts, .quick, .rx-pads').forEach(row => {
     let x0 = null, left0 = 0, moved = false;
     row.addEventListener('pointerdown', e => {
       if (e.pointerType !== 'mouse') return;
