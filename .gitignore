@@ -1,0 +1,10 @@
+# Base bruta do BigQuery (63 MB) — fica fora do repositório
+bq-results-*.csv
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+.vscode/
+.idea/

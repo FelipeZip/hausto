@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4621F">
+<title>Conta Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #F4621F;
+    --orange-soft: #F8834A;
+    --navy: #1C2570;
+    --blue: #3A4FD8;
+    --bg: #F0F1F4;
+    --card: #FFFFFF;
+    --text: #1B1B1F;
+    --muted: #5C5F6A;
+    --line: #D9DBE1;
+    --red: #C8102E;
+    --green: #0A7F3F;
+    --radius: 22px;
+
+    /* ---------- Tipografia: escala por nível de atenção ----------
+       Use SEMPRE um destes tokens; não crie tamanhos avulsos.
+       display  28  O número que a pessoa veio ver (saldo, fatura) e a manchete do onboarding
+       title    22  Título da tela e marca
+       heading  18  Chamada de card de destaque (insight do Hausto)
+       body-lg  16  Nomes e ações principais (CTA, cabeçalho do chat, campo de texto*)
+       body     15  Texto de leitura (conversa, itens do extrato, rótulos de card)
+       body-sm  14  Apoio e botões secundários (chips, respostas rápidas, descrições)
+       caption  13  Metadados de baixa atenção (datas, legendas, tabelas de detalhe)
+       micro    12  Selos, tags, navegação e avisos legais — nunca menor que isto
+       * inputs ficam em 16px para o iOS não dar zoom ao focar. */
+    --fs-display: 28px;
+    --fs-title: 22px;
+    --fs-heading: 18px;
+    --fs-body-lg: 16px;
+    --fs-body: 15px;
+    --fs-body-sm: 14px;
+    --fs-caption: 13px;
+    --fs-micro: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #2A2D36;
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  svg { display: block; }
+
+  /* ---------- Moldura do celular (some em telas pequenas) ---------- */
+  .phone {
+    width: 390px; height: min(844px, calc(100vh - 40px));
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.45);
+    display: flex; flex-direction: column;
+  }
+  @media (max-width: 500px) {
+    body { background: var(--bg); align-items: stretch; }
+    .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+  }
+
+  /* ---------- Status bar + header ---------- */
+  .top { background: var(--orange); color: #fff; flex-shrink: 0; }
+  .status {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 24px 0; font-size: var(--fs-body-sm); font-weight: 600;
+  }
+  .status .icons { display: flex; gap: 6px; align-items: center; }
+  .battery {
+    background: rgba(255,255,255,.85); color: var(--orange);
+    border-radius: 10px; padding: 1px 7px; font-size: var(--fs-micro); font-weight: 700;
+  }
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px 34px;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: #fff; color: var(--text);
+    display: grid; place-items: center; font-weight: 600; font-size: var(--fs-body-lg);
+  }
+  .level {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--orange-soft); border-radius: 20px;
+    padding: 8px 14px; font-weight: 600; font-size: var(--fs-body);
+  }
+  .level .dot {
+    width: 16px; height: 16px; border-radius: 50%; background: #fff; color: var(--orange);
+    font-size: var(--fs-micro); font-weight: 700; display: grid; place-items: center;
+  }
+  .header-right { display: flex; gap: 22px; align-items: center; }
+  .bell { position: relative; }
+  .bell::after {
+    content: ""; position: absolute; top: -2px; right: -2px;
+    width: 9px; height: 9px; border-radius: 50%; background: #B00020; border: 2px solid var(--orange);
+  }
+
+  /* ---------- Conteúdo ---------- */
+  .content {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    background: var(--bg);
+    border-radius: var(--radius) var(--radius) 0 0;
+    margin-top: -20px; position: relative;
+    padding-bottom: 24px;
+    scrollbar-width: none;
+  }
+  .content::-webkit-scrollbar { display: none; }
+  .screen { display: none; }
+  .screen.active { display: block; animation: fade .2s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .title-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 28px 24px 22px;
+  }
+  .title-row h1 { font-size: var(--fs-title); font-weight: 700; }
+  .eye-btn { padding: 6px; border-radius: 50%; }
+  .eye-btn:active { background: rgba(0,0,0,.06); }
+
+  /* atalhos */
+  .shortcuts {
+    display: flex; align-items: flex-start; gap: 12px; overflow-x: auto; padding: 14px 20px 8px;
+    scrollbar-width: none;
+  }
+  .shortcuts::-webkit-scrollbar { display: none; }
+  .shortcut { flex: 0 0 auto; width: 80px; text-align: center; position: relative; }
+  .shortcut .ico {
+    width: 80px; height: 80px; background: var(--card); border-radius: 18px;
+    display: grid; place-items: center; margin-bottom: 10px; transition: transform .1s;
+  }
+  .shortcut:active .ico { transform: scale(.95); }
+  .shortcut span { font-size: var(--fs-body-sm); color: var(--muted); line-height: 1.3; display: block; }
+  .shortcut .tag {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--blue); color: #fff; font-size: var(--fs-micro); font-weight: 500;
+    padding: 3px 10px; border-radius: 6px; white-space: nowrap; z-index: 1;
+  }
+
+  /* cards */
+  .card {
+    background: var(--card); border-radius: 22px;
+    margin: 20px 20px 0; padding: 24px;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px; width: 100%; text-align: left;
+  }
+  .card-head .label {
+    display: flex; align-items: center; gap: 10px;
+    font-size: var(--fs-body); font-weight: 500; color: #4A4A55;
+  }
+  .card-head > svg { width: 19px; height: 19px; stroke: #6B6B76; }
+  .badge-acc {
+    width: 24px; height: 24px; border-radius: 6px; background: var(--navy);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .badge-acc svg { width: 14px; height: 14px; }
+  .badge-card {
+    width: 29px; height: 19px; border-radius: 5px; background: #E6E7EB;
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .badge-card svg { width: 17px; height: 10px; }
+  .small { font-size: var(--fs-body-sm); color: var(--muted); }
+  .amount { font-size: var(--fs-display); font-weight: 700; margin: 6px 0 14px; letter-spacing: -.3px; }
+  .amount.neg { color: var(--red); }
+  .note { font-size: var(--fs-body); color: var(--text); }
+  .divider { height: 1px; background: var(--line); margin: 22px 0 18px; }
+  .row-link {
+    display: flex; justify-content: space-between; align-items: center; width: 100%;
+    font-size: var(--fs-body-lg);
+  }
+  .row-link .right { display: flex; gap: 14px; align-items: center; font-weight: 600; }
+  .hidden-val { letter-spacing: 3px; }
+
+  .progress { height: 6px; border-radius: 3px; background: #E6E7EB; margin: 14px 0 8px; overflow: hidden; }
+  .progress > i { display: block; height: 100%; background: var(--orange); border-radius: 3px; }
+  .meta { display: flex; justify-content: space-between; font-size: var(--fs-caption); color: var(--muted); }
+
+  /* card do assistente */
+  .insight {
+    background:
+      radial-gradient(130% 100% at 100% 0%, rgba(244,98,31,.35) 0%, rgba(244,98,31,0) 58%),
+      radial-gradient(100% 90% at 0% 100%, rgba(124,92,255,.25) 0%, rgba(124,92,255,0) 60%),
+      linear-gradient(135deg, var(--navy) 0%, #34409E 60%, #4A3FA2 100%);
+    color: #fff; border-radius: 22px; margin: 20px 20px 0; padding: 20px 22px;
+    position: relative; overflow: hidden;
+  }
+  .insight .kicker {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: var(--fs-micro); font-weight: 600; text-transform: uppercase; letter-spacing: .6px;
+    background: rgba(255,255,255,.14); padding: 4px 10px; border-radius: 20px;
+  }
+  .insight h3 { font-size: var(--fs-heading); font-weight: 700; margin: 12px 0 6px; line-height: 1.3; position: relative; z-index: 1; }
+  .insight p { font-size: var(--fs-body-sm); opacity: .85; line-height: 1.45; position: relative; z-index: 1; }
+  .insight .actions { display: flex; gap: 10px; margin-top: 16px; position: relative; z-index: 1; }
+  .btn {
+    padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: var(--fs-body-sm);
+  }
+  .btn-primary { background: var(--orange); color: #fff; }
+  .btn-ghost { background: rgba(255,255,255,.12); color: #fff; }
+
+  /* extrato */
+  .section-title { font-size: var(--fs-caption); color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; padding: 22px 24px 8px; }
+  .list { background: var(--card); border-radius: 22px; margin: 0 20px; padding: 4px 20px; }
+  .tx { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #EEF0F3; }
+  .tx:last-child { border-bottom: 0; }
+  .tx .cat { width: 40px; height: 40px; border-radius: 12px; background: #F3F4F7; display: grid; place-items: center; font-size: var(--fs-heading); flex-shrink: 0; }
+  .tx .info { flex: 1; min-width: 0; }
+  .tx .info b { font-weight: 500; font-size: var(--fs-body); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tx .info small { color: var(--muted); font-size: var(--fs-caption); }
+  .tx .val { font-weight: 600; font-size: var(--fs-body); white-space: nowrap; }
+  .tx .val.in { color: var(--green); }
+
+  .chips { display: flex; gap: 8px; padding: 22px 20px 0; overflow-x: auto; scrollbar-width: none; }
+  .chip { flex: 0 0 auto; padding: 8px 14px; border-radius: 20px; background: var(--card); font-size: var(--fs-body-sm); border: 1px solid var(--line); }
+  .chip.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  /* grade do menu */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 20px; }
+  .grid .item { background: var(--card); border-radius: 18px; padding: 18px 8px; text-align: center; font-size: var(--fs-caption); color: var(--muted); }
+  .grid .item .ico { display: grid; place-items: center; margin-bottom: 10px; }
+
+  /* ---------- Bottom nav ---------- */
+  .nav {
+    flex-shrink: 0; background: var(--card);
+    display: grid; grid-template-columns: repeat(5, 1fr); align-items: start;
+    padding: 10px 4px 14px; border-top: 1px solid #ECEDF1;
+  }
+  .nav button { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; font-size: var(--fs-micro); color: var(--muted); min-width: 0; height: 54px; outline: none; -webkit-tap-highlight-color: transparent; }
+  /* bloco navy do item ativo: surge com efeito mola */
+  .nav button::before {
+    content: ""; position: absolute; top: 0; left: 50%; width: 60px; height: 54px; margin-left: -30px;
+    border-radius: 16px; background: var(--navy);
+    transform: scale(.5); opacity: 0;
+    transition: transform .4s cubic-bezier(.34, 1.56, .64, 1), opacity .2s;
+  }
+  .nav button.active::before { transform: scale(1); opacity: 1; }
+  .nav button:focus-visible::after { content: ""; position: absolute; inset: -3px; border-radius: 18px; outline: 2px solid var(--navy); outline-offset: 0; }
+  .nav .home-ico { position: relative; width: 56px; height: 34px; display: grid; place-items: center; }
+  .nav .home-ico svg { stroke: var(--text); width: 24px; height: 24px; transition: stroke .25s, transform .4s cubic-bezier(.34, 1.56, .64, 1); }
+  .nav button.active .home-ico svg { stroke: #fff; transform: translateY(10px) scale(1.08); }
+  .nav .lbl { position: relative; white-space: nowrap; transition: opacity .2s, transform .3s; }
+  .nav button.active .lbl { opacity: 0; transform: translateY(6px); }
+  @media (prefers-reduced-motion: reduce) {
+    .nav button::before, .nav .home-ico svg, .nav .lbl { transition: none; }
+  }
+  .gesture { flex-shrink: 0; background: var(--card); display: flex; justify-content: space-around; padding: 4px 60px 14px; color: #555; }
+
+
+  /* ---------- Open Finance: bancos para conectar (dentro do card da conta) ---------- */
+  .of-row {
+    display: flex; gap: 8px; overflow-x: auto; margin: 4px -24px 0; padding: 2px 24px;
+    scroll-snap-type: x mandatory; scroll-padding: 0 24px; scrollbar-width: none;
+  }
+  .of-row::-webkit-scrollbar { display: none; }
+  .of-pill {
+    flex: 0 0 auto; scroll-snap-align: start;
+    display: flex; align-items: center; gap: 6px;
+    padding: 3px 4px 3px 3px; border: 1px solid var(--line); border-radius: 999px;
+    font-size: var(--fs-micro); color: var(--text); white-space: nowrap;
+  }
+  .of-row.dragging, .shortcuts.dragging { scroll-snap-type: none; cursor: grabbing; user-select: none; }
+  .of-row.dragging *, .shortcuts.dragging * { pointer-events: none; }
+  .of-pill:active { background: #F3F4F7; }
+  .of-logo { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
+  .of-plus { width: 16px; height: 16px; border-radius: 50%; background: #F3F4F7; display: grid; place-items: center; }
+
+  /* ---------- Dica do Hausto no card do cartão ---------- */
+  .ai-tip {
+    --tip: var(--orange); --tip-bg: #FFF4EC;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: var(--tip-bg); border-radius: 999px; padding: 9px 12px; margin: 14px 0 0;
+    font-size: var(--fs-body-sm); color: var(--text);
+    cursor: pointer; transition: transform .12s, filter .15s;
+  }
+  .ai-tip:hover, .ai-tip:focus-visible { filter: brightness(.97); outline: none; }
+  .ai-tip:active { transform: scale(.985); }
+  .ai-tip.good { --tip: var(--green); --tip-bg: #EEF8F2; }
+  .ai-tip.warn { --tip: var(--red); --tip-bg: #FFF1F0; }
+  .ai-lbl { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .ai-lbl svg { color: var(--tip); flex-shrink: 0; }
+  .ai-pay { white-space: nowrap; }
+  .ai-pay b { font-weight: 700; }
+
+  /* ---------- Valores explicáveis (abrem o Hausto) ---------- */
+  .explain {
+    cursor: pointer; border-radius: 6px;
+    text-decoration: underline dotted; text-decoration-thickness: 2px; text-underline-offset: 5px;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    transition: background .15s;
+  }
+  .explain::after {
+    content: "✦"; font-size: .55em; color: var(--orange); margin-left: 5px;
+    vertical-align: super; display: inline-block;
+  }
+  .insight .explain::after { color: #FFB27A; }
+  .explain:hover, .explain:focus-visible { background: rgba(244,98,31,.10); outline: none; }
+  .explain:active { background: rgba(244,98,31,.18); }
+
+  /* ---------- Chat do Hausto (bottom sheet) ---------- */
+  .sheet-bg {
+    position: absolute; inset: 0; background: rgba(0,0,0,.4);
+    opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 20;
+  }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 62%;
+    background: var(--bg); border-radius: 26px 26px 0 0; z-index: 21;
+    transform: translateY(100%);
+    transition: transform .32s cubic-bezier(.2,.8,.2,1), height .32s cubic-bezier(.2,.8,.2,1), border-radius .32s;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 -8px 30px rgba(0,0,0,.18);
+  }
+  .sheet.full { height: 100%; border-radius: 0; }
+  .sheet.dragging { transition: none; }
+  .open .sheet-bg { opacity: 1; pointer-events: auto; }
+  .open .sheet { transform: none; }
+  .sheet-top { background: var(--card); border-bottom: 1px solid var(--line); touch-action: none; cursor: grab; user-select: none; }
+  .sheet.full .sheet-top { padding-top: 28px; }
+  .grab { width: 44px; height: 5px; border-radius: 3px; background: #C9CBD2; margin: 10px auto 0; }
+  .sheet-head { display: flex; align-items: center; gap: 12px; padding: 10px 12px 14px 20px; }
+  .sheet-head .bot { width: 40px; height: 40px; border-radius: 50%; background: var(--navy); display: grid; place-items: center; flex-shrink: 0; }
+  .sheet-head b { display: block; font-size: var(--fs-body-lg); }
+  .sheet-head small { color: var(--green); font-size: var(--fs-micro); }
+  .sheet-head .tools { margin-left: auto; display: flex; gap: 2px; }
+  .sheet-head .tools button { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+  .sheet-head .tools button:hover { background: #F0F1F4; }
+  .msgs { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; cursor: grab; scrollbar-width: none; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .msgs::-webkit-scrollbar { display: none; }
+  .msgs.dragging { cursor: grabbing; user-select: none; }
+  .msgs.dragging * { pointer-events: none; }
+  .msg { max-width: 86%; padding: 11px 14px; border-radius: 18px; font-size: var(--fs-body); line-height: 1.45; animation: pop .2s ease; }
+  @keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .msg.bot { background: var(--card); border-bottom-left-radius: 6px; align-self: flex-start; }
+  .msg.me { background: var(--navy); color: #fff; border-bottom-right-radius: 6px; align-self: flex-end; }
+  .msg ul { padding-left: 18px; margin-top: 4px; }
+  .msg li { margin: 3px 0; }
+  .ctx {
+    align-self: center; display: flex; align-items: center; gap: 10px;
+    background: #FFF1E9; border: 1px solid #FBD3BD; border-radius: 14px; padding: 8px 14px; font-size: var(--fs-caption); margin: 6px 0;
+  }
+  .ctx b { font-size: var(--fs-body); }
+  .opt-card { background: var(--card); border-radius: 16px; padding: 12px 14px; font-size: var(--fs-body-sm); line-height: 1.45; border-left: 4px solid; animation: pop .2s ease; }
+  .opt-card.good { border-color: var(--green); } .opt-card.warn { border-color: #D98E04; } .opt-card.bad { border-color: var(--red); }
+  .opt-card strong { display: block; margin-bottom: 2px; }
+  .detail { width: 100%; font-size: var(--fs-caption); border-collapse: collapse; margin-top: 6px; }
+  .detail td { padding: 5px 0; border-bottom: 1px solid #EEF0F3; }
+  .detail td:last-child { text-align: right; font-weight: 600; white-space: nowrap; padding-left: 10px; }
+  .detail tr:last-child td { border-bottom: 0; }
+  .safe { align-self: center; font-size: var(--fs-micro); color: var(--muted); text-align: center; margin-bottom: 2px; }
+  .quick { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; padding: 0 16px 10px; scroll-padding-left: 16px; }
+  .quick::-webkit-scrollbar { display: none; }
+  .quick button { flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start; background: var(--card); border: 1.5px solid var(--orange); color: var(--orange); border-radius: 18px; padding: 8px 13px; font-size: var(--fs-body-sm); font-weight: 600; }
+  .quick button:active { background: var(--orange); color: #fff; }
+  .composer { display: flex; gap: 8px; padding: 10px 16px 18px; background: var(--card); border-top: 1px solid var(--line); }
+  .composer input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 22px; padding: 11px 16px; font: inherit; font-size: var(--fs-body-lg); outline: none; }
+  .composer input:focus { border-color: var(--orange); }
+  .composer button { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); display: grid; place-items: center; flex-shrink: 0; }
+  .answer { align-self: stretch; font-size: var(--fs-body); line-height: 1.6; color: var(--text); padding: 4px 2px 8px; display: flex; flex-direction: column; gap: 10px; }
+  .answer .para ul { padding-left: 20px; margin: 0; }
+  .answer .para li { margin: 2px 0; }
+  .answer .opt-card { box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  .msg-actions { display: flex; align-items: center; gap: 4px; margin-top: -2px; }
+  .msg-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 40px; height: 40px; border-radius: 20px; color: var(--muted); font-size: var(--fs-body-sm); }
+  .msg-actions button { -webkit-tap-highlight-color: transparent; }
+  .msg-actions button:hover { color: var(--navy); }
+  .msg-actions button:focus { outline: none; }
+  .msg-actions button[aria-pressed="true"] { color: var(--navy); }
+  .msg-actions button[aria-pressed="true"] svg { fill: currentColor; }
+  .msg-actions svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .msg-actions .ouvir svg { fill: none !important; }
+  .msg-actions .thanks { font-size: var(--fs-caption); color: var(--muted); margin-left: 4px; }
+  .caret { display: inline-block; width: 8px; height: 1.05em; background: var(--orange); border-radius: 2px; margin-left: 2px; vertical-align: -2px; animation: blink .8s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .typing { display: inline-flex; gap: 4px; }
+  .typing i { width: 6px; height: 6px; border-radius: 50%; background: #999; animation: b 1s infinite; }
+  .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+  @keyframes b { 0%,60%,100% { opacity: .3; } 30% { opacity: 1; } }
+
+  /* ---------- Onboarding: escolha da persona ---------- */
+  .onb { position: absolute; inset: 0; z-index: 40; background: var(--bg); display: flex; flex-direction: column; transition: opacity .3s, transform .3s; }
+  .onb.hide { opacity: 0; transform: translateY(24px); pointer-events: none; }
+  .onb-top { background: var(--orange); color: #fff; padding: 44px 24px 48px; border-radius: 0 0 28px 28px; flex-shrink: 0; }
+  .onb-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: var(--fs-title); }
+  .onb-logo .bot { width: 36px; height: 36px; border-radius: 50%; background: var(--navy); display: grid; place-items: center; }
+  .onb-tag { display: inline-block; margin-top: 18px; background: rgba(255,255,255,.2); padding: 4px 10px; border-radius: 20px; font-size: var(--fs-micro); font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
+  .onb-top h2 { font-size: var(--fs-display); line-height: 1.25; margin-top: 10px; font-weight: 800; }
+  .onb-top p { font-size: var(--fs-body); opacity: .92; margin-top: 6px; line-height: 1.45; }
+  .onb-list { flex: 1; overflow-y: auto; padding: 0 20px 8px; margin-top: -26px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
+  .onb-list::-webkit-scrollbar { display: none; }
+  .persona { background: var(--card); border-radius: 20px; padding: 16px; text-align: left; border: 2px solid transparent; box-shadow: 0 2px 12px rgba(0,0,0,.07); transition: border-color .15s, transform .1s; width: 100%; flex-shrink: 0; }
+  .persona:active { transform: scale(.99); }
+  .persona.sel { border-color: var(--orange); }
+  .p-row { display: flex; gap: 12px; align-items: center; }
+  .p-av { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .p-who { flex: 1; min-width: 0; }
+  .p-name { font-weight: 700; font-size: var(--fs-body-lg); }
+  .p-meta { font-size: var(--fs-caption); color: var(--muted); }
+  .p-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; flex-shrink: 0; }
+  .p-check svg { opacity: 0; }
+  .persona.sel .p-check { background: var(--orange); border-color: var(--orange); }
+  .persona.sel .p-check svg { opacity: 1; }
+  .p-quote { font-size: var(--fs-body-sm); font-style: italic; color: var(--text); margin: 12px 0 10px; line-height: 1.45; }
+  .p-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .p-chips span { font-size: var(--fs-micro); background: #F0F1F4; border-radius: 10px; padding: 4px 9px; color: var(--muted); }
+  .p-chips .p-perfil { background: #FFF1E9; color: var(--orange); font-weight: 700; }
+  .onb-foot { padding: 12px 20px 22px; text-align: center; flex-shrink: 0; }
+  .onb-go { width: 100%; padding: 15px; font-size: var(--fs-body-lg); border-radius: 14px; }
+  .onb-go:disabled { background: #C9CBD2; cursor: default; }
+  .onb-foot small { display: block; margin-top: 8px; color: var(--muted); font-size: var(--fs-micro); }
+  .avatar { cursor: pointer; }
+
+  /* Persona INSS: a escala inteira do chat sobe um degrau (mesmos tokens, valores maiores) */
+  .p-maria .sheet {
+    --fs-body-lg: 18px; --fs-body: 17px; --fs-body-sm: 15px; --fs-caption: 14px; --fs-micro: 13px;
+  }
+  .p-maria .quick button { padding: 10px 14px; }
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+  <!-- Topo laranja -->
+  <div class="top">
+    <div class="status">
+      <span>15:24</span>
+      <div class="icons">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M2 20h2M7 20v-4M12 20v-8M17 20V8M22 20V4" stroke-linecap="round"/></svg>
+        <span class="battery">44</span>
+      </div>
+    </div>
+    <div class="header">
+      <div class="header-left">
+        <button class="avatar" id="avatar" onclick="showOnboarding()" aria-label="Trocar persona">GM</button>
+        <div class="level"><span class="dot">4</span> Nível 4</div>
+      </div>
+      <div class="header-right">
+        <button aria-label="Buscar"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+        <button aria-label="Notificações" class="bell"><svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 22a2.5 2.5 0 0 0 2.4-2h-4.8A2.5 2.5 0 0 0 12 22zm7-6V11a7 7 0 0 0-5.5-6.8V3.5a1.5 1.5 0 0 0-3 0v.7A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"/></svg></button>
+        <button aria-label="Assistente" onclick="openChat()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M4 4h16v12H9l-5 4V4z"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conteúdo -->
+  <main class="content" id="content">
+
+    <!-- INÍCIO -->
+    <section class="screen active" data-screen="home">
+      <div class="title-row">
+        <h1>Minha conta</h1>
+        <button class="eye-btn" id="eyeBtn" aria-label="Mostrar/ocultar valores" onclick="toggleValues()">
+          <svg id="eyeIco" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M3 10c2.5 3 5.5 4.5 9 4.5s6.5-1.5 9-4.5M6 13l-1.5 2M18 13l1.5 2M12 14.5V17"/></svg>
+        </button>
+      </div>
+
+      <div class="shortcuts">
+        <button class="shortcut"><div class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.6"><path d="M12 2.5l4 4-4 4-4-4 4-4zM12 13.5l4 4-4 4-4-4 4-4zM6.5 8l4 4-4 4-4-4 4-4zM17.5 8l4 4-4 4-4-4 4-4z"/></svg></div><span>Pix e transferir</span></button>
+        <button class="shortcut"><div class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M3 5v14M7 5v14M10 5v6M13 5v14M16 5v6M19 5v14"/></svg></div><span>Pagar</span></button>
+        <button class="shortcut"><span class="tag">Oferta</span><div class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="6" width="13" height="14" rx="2"/><path d="M10.5 9v8M12.5 10.5h-2.8a1.4 1.4 0 0 0 0 2.8h1.6a1.4 1.4 0 0 1 0 2.8H8.5M19 3v5M16.5 5.5h5"/></svg></div><span>Crédito disponível</span></button>
+        <button class="shortcut"><div class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-dasharray="3 2"><rect x="3" y="6" width="18" height="12" rx="2"/></svg></div><span>Cartão virtual</span></button>
+        <button class="shortcut"><div class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="15" rx="2"/><path d="M12 9v3M7 19v2M17 19v2"/><circle cx="12" cy="8" r=".6" fill="#1B1B1F"/></svg></div><span>Cofrinho</span></button>
+        <button class="shortcut"><div class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg></div><span>Recarga de celular</span></button>
+      </div>
+
+      <!-- Insight do agente -->
+      <div class="insight" id="insight">
+        <span class="kicker">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+          Hausto
+        </span>
+        <h3 id="insTitle"></h3>
+        <p id="insText"></p>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="openChat('caminhos')">Ver meu plano</button>
+          <button class="btn btn-ghost" onclick="this.closest('.insight').style.display='none'">Agora não</button>
+        </div>
+      </div>
+
+      <!-- Conta corrente -->
+      <div class="card">
+        <button class="card-head" onclick="go('extrato')">
+          <span class="label">
+            <span class="badge-acc"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 10h16M6 10v8M10 10v8M14 10v8M18 10v8M3 20h18M12 3l9 5H3z"/></svg></span>
+            Conta corrente
+          </span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="small">Saldo</div>
+        <div class="amount money explain" id="vSaldo" data-explain="saldo" data-label="Saldo da conta" role="button" tabindex="0"></div>
+        <div class="of-row" aria-label="Conectar outros bancos (Open Finance)">
+          <button class="of-pill" aria-label="Conectar Mercado Pago"><svg class="of-logo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="22" fill="#00B1EA"/><ellipse cx="22" cy="22" rx="15" ry="10" fill="#fff" stroke="#2D3277" stroke-width="1.8"/><path d="M11 21.5l4.5-2.5 4 1.5 3-2 3.5.5 5 3M15.5 19l5.5 5.5c.8.8 2 .8 2.6 0M19 22.5l3.5 3.2M21.5 21.5l3.5 3M26.5 21l3 2.5" fill="none" stroke="#2D3277" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Mercado Pago<span class="of-plus"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#858893" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+          <button class="of-pill" aria-label="Conectar Nubank"><svg class="of-logo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="22" fill="#820AD1"/><text x="22" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#fff">nu</text></svg>Nubank<span class="of-plus"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#858893" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+          <button class="of-pill" aria-label="Conectar Itaú"><svg class="of-logo" viewBox="0 0 44 44"><rect width="44" height="44" rx="10" fill="#EC7000"/><rect x="7" y="7" width="30" height="30" rx="6" fill="#003399"/><text x="22" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#FFD700">itaú</text></svg>Itaú<span class="of-plus"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#858893" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+          <button class="of-pill" aria-label="Conectar Bradesco"><svg class="of-logo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="22" fill="#CC092F"/><path d="M12 25c3-6 17-6 20 0M14 19c2 3 14 3 16 0M22 12v20" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Bradesco<span class="of-plus"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#858893" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+          <button class="of-pill" aria-label="Conectar Banco do Brasil"><svg class="of-logo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="22" fill="#FCFC30"/><path d="M13 16l9-5 9 5-9 5zM13 28l9 5 9-5-9-5z" fill="none" stroke="#0038A8" stroke-width="2.6" stroke-linejoin="round"/></svg>Banco do Brasil<span class="of-plus"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#858893" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+          <button class="of-pill" aria-label="Conectar Santander"><svg class="of-logo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="22" fill="#EC0000"/><path d="M22 10c-3 4 3 7 0 11M17 15c-2 3 2 5 0 8M27 15c-2 3 2 5 0 8M11 27c7-3 15-3 22 0v5H11z" fill="#fff" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>Santander<span class="of-plus"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#858893" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+          <button class="of-pill" aria-label="Conectar Caixa"><svg class="of-logo" viewBox="0 0 44 44"><circle cx="22" cy="22" r="22" fill="#005CA9"/><path d="M13 13l18 18M31 13L13 31" stroke="#F39200" stroke-width="5" stroke-linecap="round"/></svg>Caixa<span class="of-plus"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#858893" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        </div>
+      </div>
+
+      <!-- Cartão -->
+      <div class="card">
+        <button class="card-head">
+          <span class="label">
+            <span class="badge-card"><svg width="20" height="12" viewBox="0 0 20 12"><circle cx="7" cy="6" r="5" fill="#E8352E"/><circle cx="13" cy="6" r="5" fill="#F59E0B" fill-opacity=".9"/></svg></span>
+            <span id="cardName"></span>
+          </span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="small">Fatura aberta</div>
+        <div class="amount money explain" id="vFatura" data-explain="fatura" data-label="Fatura aberta" role="button" tabindex="0"></div>
+        <div class="progress"><i id="faturaBar"></i></div>
+        <div class="meta"><span id="vencTxt"></span><span>Limite livre <b class="money explain" id="vLivre" data-explain="livre" data-label="Limite livre do cartão" role="button" tabindex="0"></b></span></div>
+        <!-- Dica do Hausto: como fica o saldo se pagar a fatura -->
+        <div class="ai-tip" id="aiTip" role="button" tabindex="0" aria-label="Conversar com o Hausto sobre a fatura">
+          <span class="ai-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg><span id="aiLbl"></span></span>
+          <span class="ai-pay">Pague <b class="money" id="aiPay"></b></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXTRATO -->
+    <section class="screen" data-screen="extrato">
+      <div class="title-row"><h1>Extrato</h1></div>
+      <div class="chips" style="padding-top:0">
+        <button class="chip on">Todos</button><button class="chip">Entradas</button><button class="chip">Saídas</button><button class="chip">Futuros</button>
+      </div>
+      <div id="extratoList"></div>
+    </section>
+
+    <!-- PAGAMENTOS -->
+    <section class="screen" data-screen="pagamentos">
+      <div class="title-row"><h1>Pagamentos</h1></div>
+      <div class="grid">
+        <button class="item"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.6"><path d="M12 2.5l4 4-4 4-4-4 4-4zM12 13.5l4 4-4 4-4-4 4-4zM6.5 8l4 4-4 4-4-4 4-4zM17.5 8l4 4-4 4-4-4 4-4z"/></svg></div>Pix</button>
+        <button class="item"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M3 5v14M7 5v14M10 5v6M13 5v14M16 5v6M19 5v14"/></svg></div>Boleto</button>
+        <button class="item"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h13l-3-3M20 17H7l3 3"/></svg></div>Transferir</button>
+        <button class="item"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>Agendados</button>
+        <button class="item"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg></div>Débito automático</button>
+        <button class="item"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="1.8" stroke-linecap="round"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg></div>Recarga</button>
+      </div>
+    </section>
+
+    <!-- PRA VOCÊ -->
+    <section class="screen" data-screen="pravoce">
+      <div class="title-row"><h1>Pra você</h1></div>
+      <div class="insight" style="margin-top:0">
+        <span class="kicker">Simular imprevisto</span>
+        <h3 id="evTitle"></h3>
+        <p id="evText"></p>
+        <div class="actions"><button class="btn btn-primary" onclick="openChat('imprevisto')">Simular meu imprevisto</button></div>
+      </div>
+      <div class="insight">
+        <span class="kicker">Simular objetivo</span>
+        <h3 id="objTitle"></h3>
+        <p id="objText"></p>
+        <div class="actions"><button class="btn btn-primary" onclick="openChat('objetivo')">Posso comprar?</button></div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section class="screen" data-screen="menu">
+      <div class="title-row"><h1>Menu</h1></div>
+      <div class="grid">
+        <button class="item">Cartões</button><button class="item">Investimentos</button><button class="item">Empréstimos</button>
+        <button class="item">Seguros</button><button class="item">Limites</button><button class="item" onclick="showOnboarding()">Trocar persona</button>
+        <button class="item" onclick="openChat()">Hausto</button><button class="item">Segurança</button><button class="item">Ajuda</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Navegação inferior -->
+  <nav class="nav" id="nav">
+    <button class="active" data-go="home"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linejoin="round"><path d="M4 10l8-6 8 6v10H4z"/><path d="M10 20v-5h4v5"/></svg></span><span class="lbl">Início</span></button>
+    <button data-go="extrato"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></span><span class="lbl">Extrato</span></button>
+    <button data-go="pagamentos"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M4 8h15l-3-3M20 16H5l3 3"/></svg></span><span class="lbl">Pagamentos</span></button>
+    <button data-go="pravoce"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="9" width="16" height="11" rx="1"/><path d="M3 9h18M12 9v11M12 9c-1.5-4-6-4-5-1.5M12 9c1.5-4 6-4 5-1.5"/></svg></span><span class="lbl">Pra você</span></button>
+    <button data-go="menu"><span class="home-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg></span><span class="lbl">Menu</span></button>
+  </nav>
+
+  <!-- Chat do Hausto -->
+  <div class="sheet-bg" onclick="closeChat()"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-label="Hausto, assistente financeiro">
+    <div class="sheet-top" id="sheetTop">
+      <div class="grab"></div>
+      <div class="sheet-head">
+        <div class="bot"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg></div>
+        <div><b>Hausto</b></div>
+        <div class="tools">
+          <button id="sizeBtn" onclick="toggleSize()" aria-label="Aumentar tela"></button>
+          <button onclick="closeChat()" aria-label="Fechar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="quick" id="quick"></div>
+    <form class="composer" onsubmit="send(event)">
+      <input id="input" placeholder="Pergunte sobre esse valor..." autocomplete="off">
+      <button type="submit" aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </form>
+  </div>
+  <!-- Onboarding: escolha da persona (teste prévio) -->
+  <div class="onb" id="onb">
+    <div class="onb-top">
+      <div class="onb-logo"><span class="bot"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg></span>Hausto</div>
+      <span class="onb-tag">Teste prévio</span>
+      <h2>Com quem o Hausto vai conversar?</h2>
+      <p>Escolha uma persona. O app e a conversa se adaptam a ela.</p>
+    </div>
+    <div class="onb-list" id="onbList"></div>
+    <div class="onb-foot">
+      <button class="btn btn-primary onb-go" id="onbGo" disabled onclick="startPersona()">Escolha uma persona</button>
+      <small>Dados fictícios, apenas para teste.</small>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ---- navegação entre abas ----
+  const nav = document.getElementById('nav');
+  function go(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === name));
+    nav.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.go === name));
+    document.getElementById('content').scrollTop = 0;
+  }
+  nav.addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(b.dataset.go); });
+
+  // ---- mostrar / ocultar valores ----
+  let hidden = false;
+  const eyeOpen = '<circle cx="12" cy="12" r="3"/><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z"/>';
+  const eyeClosed = '<path d="M3 10c2.5 3 5.5 4.5 9 4.5s6.5-1.5 9-4.5M6 13l-1.5 2M18 13l1.5 2M12 14.5V17"/>';
+  function toggleValues() {
+    hidden = !hidden;
+    document.querySelectorAll('.money').forEach(el => {
+      el.textContent = hidden ? '••••' : el.dataset.v;
+      el.classList.toggle('hidden-val', hidden);
+    });
+    document.getElementById('eyeIco').innerHTML = hidden ? eyeOpen : eyeClosed;
+  }
+
+  // ---- Hausto: o chat que explica cada valor ----
+  // Segue o guia de UX (Hausto_UX_Agente.md): consequência antes do conceito,
+  // números arredondados na explicação, no máximo 3 caminhos com botões,
+  // sem jargão, sem julgamento, checagem de compreensão (teach-back).
+  // Todo número abaixo viria das funções de cálculo; aqui é roteiro fixo para a demo.
+  const phone = document.getElementById('phone');
+  const sheet = document.getElementById('sheet');
+  const msgs = document.getElementById('msgs');
+  const quick = document.getElementById('quick');
+  const sizeBtn = document.getElementById('sizeBtn');
+
+  const ICON_EXPAND = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+  const ICON_SHRINK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B1B1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>';
+
+  // ---- Personas do teste prévio (Hausto_Personas.md) ----
+  // O app e a conversa mudam conforme a persona escolhida no onboarding.
+  const fmt = v => (v < 0 ? '-' : '') + 'R$ ' + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const card = (kind, title, body) => ({ card: kind, title, body });
+
+  const PERSONAS = {
+    /* ================= DONA MARIA · INSS ================= */
+    maria: {
+      id: 'maria', nome: 'Dona Maria Aparecida', curto: 'Dona Maria', ini: 'MA', cor: '#8E4FB8',
+      idade: 67, perfil: 'INSS', cidade: 'Guarulhos (SP)',
+      quote: '"Eu pago o que dá. Todo mês parece que a fatura é a mesma."',
+      chips: ['Trata por "senhora"', 'Frases curtas', 'Fonte grande', 'Ouvir em áudio'],
+      greet: 'Bom dia, Dona Maria. Aqui é o Hausto, do seu banco.',
+      saldo: 1050,
+      renda: { label: 'Benefício INSS', data: '03/11', valor: 1520 },
+      final: '2214', fatura: 1240, venc: '10/out', limite: 1800, sugerido: 420,
+      insight: { titulo: 'Dá para pagar parte da fatura sem faltar para a casa', antes: 'Até o benefício cair, dia 3, a senhora pode pagar', depois: 'da fatura.' },
+      hist: '8 de 12', histNote: 'Nos meses em que pagou tudo, teve ajuda dos filhos ou o 13º.',
+      evento: { titulo: 'O médico passou um remédio novo', texto: 'Custa R$ 90 por mês. Veja como fica a conta da fatura.',
+        chip: 'Um remédio novo (R$ 90)', minimo: 186, depois: 0,
+        pergunta: 'Aconteceu algum gasto que a senhora não esperava? Escreva aqui embaixo o que foi e quanto custa. Por exemplo: “dentista, 150”.',
+        decisao: 'A decisão é da senhora.' },
+      // quanto dá para separar por mês, depois das contas e da parte da fatura
+      objetivo: { titulo: 'Quer comprar alguma coisa?', texto: 'Um presente, um móvel, um aparelho. Eu vejo se cabe no seu mês sem faltar para a casa.',
+        folga: 50, exemplo: 'Presente da neta, 150', chip: 'Presente da neta (R$ 150)',
+        pergunta: 'O que a senhora quer comprar e quanto custa? Escreva aqui embaixo. Por exemplo: “TV nova, 1.200”.' },
+      extrato: [
+        ['02 de outubro', [['🏠', 'Aluguel (minha parte)', 'Pix', -470], ['💼', 'Benefício INSS', 'Consignado de R$ 530 já descontado', 1520]]],
+        ['10 de setembro', [['💳', 'Pagamento da fatura', 'Só o mínimo', -172.5]]],
+        ['02 de setembro', [['💊', 'Farmácia', 'Débito', -64.3], ['🛒', 'Mercado', 'Pix', -280]]]
+      ],
+      menuOpts: [['Minha fatura', 'fatura'], ['Quanto posso pagar?', 'sugerido'], ['Meu saldo', 'saldo']],
+      flow: {
+        saldo: {
+          say: ['A senhora tem <b>R$ 1.050</b> na conta.', 'O benefício caiu dia 2. O aluguel de R$ 470 já foi pago.', 'Esse dinheiro precisa durar até o próximo benefício, de <b>R$ 1.520</b>, que cai dia <b>3 de novembro</b>.', 'Tirando mercado, remédio, luz, gás e água, sobram uns <b>R$ 470</b> até lá.'],
+          opts: [['O que ainda tenho pra pagar?', 'essenciais'], ['E a fatura?', 'fatura'], ['Ouvir em áudio', '__audio']]
+        },
+        renda: {
+          say: ['Seu benefício é de <b>R$ 2.050</b>.', 'O consignado desconta <b>R$ 530</b> antes de cair. Por isso chegam <b>R$ 1.520</b>.', 'O próximo cai dia <b>3 de novembro</b>.'],
+          opts: [['E a fatura?', 'fatura'], ['Ouvir em áudio', '__audio'], ['Entendi', 'fim']]
+        },
+        fatura: {
+          say: ['Sua fatura vence dia 10 e está em <b>R$ 1.240</b>.', 'Seu benefício só cai dia 3 de novembro.', 'Quer ajuda para ver quanto dá para pagar sem faltar para as contas da casa?'],
+          opts: [['Quero', 'essenciais'], ['Ouvir em áudio', '__audio'], ['Agora não', 'fim']]
+        },
+        essenciais: {
+          say: ['Até dia 3, a senhora ainda tem mercado, remédio, luz, gás e água.', 'Dá uns <b>R$ 580</b>. Está certo?'],
+          opts: [['Está certo', 'ess_ok'], ['É mais', 'ess_mais'], ['É menos', 'ess_menos']]
+        },
+        ess_ok: {
+          say: ['Obrigado.', 'Guardando R$ 50 para algum imprevisto, dá para pagar uns <b>R$ 420</b> da fatura.'],
+          opts: [['Ver os caminhos', 'caminhos'], ['Ouvir em áudio', '__audio'], ['Agora não', 'fim']]
+        },
+        ess_mais: {
+          say: ['Tudo bem. Tem alguma conta nova?'],
+          opts: [['Um remédio novo', 'evento'], ['Não, pode seguir', 'caminhos']]
+        },
+        ess_menos: { say: ['Obrigado. Vou manter R$ 580, para a senhora não ficar sem dinheiro.'], next: 'caminhos' },
+        caminhos: {
+          say: ['Separei 3 caminhos:',
+                card('good', '✅ Pagar R$ 420', 'Todas as contas ficam pagas. Mês que vem a dívida fica em uns R$ 920.'),
+                card('warn', '⚠️ Pagar só o mínimo (R$ 186)', 'Sobra mais agora. Mas mês que vem a dívida fica em uns R$ 1.180, quase igual.'),
+                card('bad', '❌ Pagar tudo', 'Faltam R$ 770 para as contas do mês.'),
+                'A decisão é da senhora.'],
+          opts: [['Pagar R$ 420', 'pagar'], ['Quero pagar tudo', 'tudo'], ['Ouvir em áudio', '__audio']]
+        },
+        tudo: {
+          say: ['Tudo bem, a decisão é da senhora.', 'Só um aviso: vão faltar uns R$ 770 para mercado, remédio e contas até dia 3.'],
+          opts: [['Entendi, vou pagar tudo', 'tudo_ok'], ['Ver os caminhos de novo', 'caminhos']]
+        },
+        tudo_ok: { say: ['Certo. O valor exato é <b>R$ 1.240,00</b>.', 'A senhora confirma na tela de pagamento.'], next: 'teach' },
+        pagar: {
+          say: ['Combinado. O valor exato é <b>R$ 420,00</b>.', 'A senhora confirma na tela de pagamento do app.', 'Se quiser, mostre esta conversa para alguém de confiança antes.'],
+          next: 'teach'
+        },
+        teach: {
+          say: ['Só para conferir: pagando só o mínimo, o que acontece com a dívida mês que vem?'],
+          simple: ['Imagine que a senhora paga só R$ 186 agora.', 'No mês que vem, a dívida vai estar menor, igual ou vai sumir?'],
+          opts: [['Diminui bastante', 'tb_fix'], ['Fica quase igual', 'tb_ok'], ['Some', 'tb_fix']]
+        },
+        tb_fix: { say: ['Quase. Pagando só o mínimo, a dívida fica quase igual.', 'Os juros comem quase tudo o que a senhora pagou.'], next: 'fim' },
+        sugerido: {
+          say: ['Esses <b>R$ 420</b> são o máximo que dá para pagar sem faltar para a casa.',
+                '<ul><li>Na conta hoje: <b>R$ 1.050</b></li><li>Contas até dia 3: <b>R$ 580</b></li><li>Guardado para imprevisto: <b>R$ 50</b></li></ul>',
+                'Sobram R$ 420 para a fatura.'],
+          opts: [['Ver os caminhos', 'caminhos'], ['Ouvir em áudio', '__audio'], ['Agora não', 'fim']]
+        },
+        livre: {
+          say: ['A senhora ainda pode gastar uns <b>R$ 560</b> no cartão.', 'Mas isso não é dinheiro sobrando. Tudo vem na próxima fatura.'],
+          opts: [['Entendi', 'teach_livre'], ['E a fatura de agora?', 'fatura'], ['Ouvir em áudio', '__audio']]
+        },
+        historico: {
+          say: ['Em 2025, a senhora pagou só uma parte ou o mínimo em <b>8 de 12</b> faturas.', 'Por isso a fatura parece nunca acabar: os juros voltam todo mês.'],
+          opts: [['Como sair disso?', 'sugerido'], ['Ouvir em áudio', '__audio'], ['Entendi', 'fim']]
+        },
+        evento: {
+          say: ['O médico passou um remédio novo, de <b>R$ 90</b> por mês. Refiz a conta.',
+                '<ul><li>Contas até dia 3: de R$ 580 para <b>R$ 670</b></li><li>Dá para pagar: de R$ 420 para <b>R$ 330</b></li><li>Dívida mês que vem: uns <b>R$ 1.020</b></li></ul>',
+                'O remédio vem primeiro. A decisão é da senhora.'],
+          opts: [['Pagar R$ 330', 'pagar_evento'], ['Ouvir em áudio', '__audio'], ['Agora não', 'fim']]
+        },
+        pagar_evento: { say: ['Combinado. O valor exato é <b>R$ 330,00</b>.', 'A senhora confirma na tela de pagamento.'], next: 'teach' },
+        fim: { say: ['Posso explicar outro valor para a senhora?'], opts: [['Explicar outro valor', 'menu'], ['Ouvir em áudio', '__audio'], ['Fechar', '__close']] }
+      }
+    },
+
+    /* ================= CARLA · CLT ================= */
+    carla: {
+      id: 'carla', nome: 'Carla Menezes', curto: 'Carla', ini: 'CM', cor: '#1F8A70',
+      idade: 34, perfil: 'CLT', cidade: 'Recife (PE)',
+      quote: '"Quando o salário cai eu acho que dá pra tudo. No dia 15 já tô no vermelho."',
+      chips: ['Direta e prática', 'Números lado a lado', 'Pagar em 2 vezes'],
+      greet: null,
+      saldo: 1620,
+      renda: { label: 'Adiantamento', data: '20/10', valor: 1000 },
+      final: '5530', fatura: 1980, venc: '12/out', limite: 3000, sugerido: 370,
+      insight: { titulo: 'Seu salário caiu hoje. Dá pra pagar a fatura em 2 vezes', antes: 'Pague', depois: 'agora e mais R$ 550 no dia 20.' },
+      hist: '6 de 12', histNote: 'Aconteceu nos meses com gasto extra: material escolar e férias do Davi.',
+      evento: { titulo: 'A geladeira quebrou', texto: 'O conserto custa R$ 70. Veja como fica a conta da fatura.',
+        chip: 'A geladeira quebrou (R$ 70)', minimo: 297, depois: 550,
+        pergunta: 'Aconteceu algum gasto fora do previsto? Me conta aqui embaixo o que foi e quanto custa. Por exemplo: “dentista, 150”.',
+        decisao: 'A decisão é sua.' },
+      objetivo: { titulo: 'Tem alguma compra em mente?', texto: 'Me conta o que é e quanto custa. Eu vejo se dá pra comprar agora ou quanto tempo leva pra juntar.',
+        folga: 100, exemplo: 'Bicicleta do Davi, 450', chip: 'Bicicleta do Davi (R$ 450)',
+        pergunta: 'O que você quer comprar e quanto custa? Me conta aqui embaixo. Por exemplo: “celular novo, 1.200”.' },
+      extrato: [
+        ['Hoje · 07/10', [['💼', 'Salário', 'Crédito em conta', 1500]]],
+        ['20 de setembro', [['💼', 'Adiantamento', 'Crédito em conta', 1000], ['💳', 'Pagamento da fatura', 'Parcial', -900]]],
+        ['15 de setembro', [['💡', 'Conta de luz', 'Débito automático', -130], ['📱', 'Celular e internet', 'Boleto', -100]]],
+        ['10 de setembro', [['🏠', 'Aluguel', 'Pix', -800]]]
+      ],
+      menuOpts: [['Minha fatura', 'fatura'], ['Pagar em 2 vezes?', 'sugerido'], ['Meu saldo', 'saldo']],
+      flow: {
+        saldo: {
+          say: ['Você tem <b>R$ 1.620</b>: o salário de R$ 1.500 que caiu hoje, mais R$ 120 que sobraram.',
+                'Até o dia 20 ainda saem uns <b>R$ 1.200</b>: aluguel, luz, celular e mercado.',
+                'Então sobram uns <b>R$ 420</b> até o dia 20, quando cai o adiantamento de <b>R$ 1.000</b>.', 'Não são R$ 1.620 livres.'],
+          opts: [['E a fatura?', 'fatura'], ['Conferir as contas', 'essenciais'], ['Entendi', 'fim']]
+        },
+        renda: {
+          say: ['Você recebe em 2 partes:', '<ul><li>Salário: <b>R$ 1.500</b>, caiu hoje (07/10)</li><li>Adiantamento: <b>R$ 1.000</b>, dia 20</li></ul>', 'O vale-alimentação de R$ 450 fica no cartão dele, fora da conta.'],
+          opts: [['Como isso ajuda na fatura?', 'sugerido'], ['Minha fatura', 'fatura'], ['Entendi', 'fim']]
+        },
+        fatura: {
+          say: ['Oi, Carla. Seu salário caiu hoje e a fatura de <b>R$ 1.980</b> vence dia 12.', 'Até o adiantamento do dia 20, você ainda tem uns <b>R$ 1.200</b> de contas.', 'Quer ver quanto dá para pagar sem apertar?'],
+          opts: [['Quero ver', 'caminhos'], ['Conferir as contas', 'essenciais'], ['Agora não', 'fim']]
+        },
+        essenciais: {
+          say: ['Até o dia 20 eu contei:', '<ul><li>Aluguel: R$ 800</li><li>Luz: R$ 130</li><li>Mercado: R$ 120</li><li>Celular e internet: R$ 100</li><li>Farmácia e escola: R$ 50</li></ul>', 'Uns <b>R$ 1.200</b>. Está certo?'],
+          opts: [['Está certo', 'caminhos'], ['Tem mais uma conta', 'evento'], ['É menos', 'ess_menos']]
+        },
+        ess_menos: { say: ['Beleza. Vou manter R$ 1.200 para você não ficar no aperto.'], next: 'caminhos' },
+        caminhos: {
+          say: ['Uma ideia que ajuda: pagar em duas vezes.',
+                card('good', '✅ R$ 370 agora + R$ 550 no dia 20', 'Mês que vem a dívida cai para uns R$ 1.200.'),
+                card('warn', '⚠️ Só o mínimo (R$ 297)', 'Mês que vem a dívida fica em uns R$ 1.890.'),
+                card('bad', '❌ Pagar tudo agora', 'Faltam R$ 1.560 para as contas até o dia 20.'),
+                'A decisão é sua.'],
+          opts: [['Pagar em 2 vezes', 'pagar'], ['Por que em 2 vezes?', 'porque2'], ['Ver a conta completa', 'conta']]
+        },
+        porque2: {
+          say: ['Os juros correm por dia.', 'Pagando R$ 550 no dia 20, esse valor para de gerar juros antes da próxima fatura.', 'Você paga uns <b>R$ 145</b> de juros no mês, em vez de uns R$ 200.'],
+          opts: [['Pagar em 2 vezes', 'pagar'], ['Ver a conta completa', 'conta']]
+        },
+        conta: {
+          say: ['A conta completa:<table class="detail">' +
+                '<tr><td>Na conta hoje</td><td>R$ 1.620,00</td></tr>' +
+                '<tr><td>Contas até o dia 20</td><td>-R$ 1.200,00</td></tr>' +
+                '<tr><td>Reserva</td><td>-R$ 50,00</td></tr>' +
+                '<tr><td><b>Pagar hoje</b></td><td>R$ 370,00</td></tr>' +
+                '<tr><td>Adiantamento (dia 20)</td><td style="color:var(--green)">R$ 1.000,00</td></tr>' +
+                '<tr><td>Contas até o salário</td><td>-R$ 400,00</td></tr>' +
+                '<tr><td>Reserva</td><td>-R$ 50,00</td></tr>' +
+                '<tr><td><b>Pagar no dia 20</b></td><td>R$ 550,00</td></tr></table>'],
+          opts: [['Pagar em 2 vezes', 'pagar'], ['Pagar só o mínimo', 'minimo']]
+        },
+        minimo: { say: ['Tudo bem. O valor exato é <b>R$ 297,00</b>.', 'O que fica faltando pagar volta com juros na próxima fatura.'], next: 'teach' },
+        pagar: {
+          say: ['Fechado. Hoje: <b>R$ 370,00</b>. Dia 20: <b>R$ 550,00</b>.', 'Você confirma na tela de pagamento.', 'Quer que eu te lembre no dia 20?'],
+          opts: [['Sim, me lembra', 'lembrete'], ['Não precisa', 'teach']]
+        },
+        lembrete: { say: ['Pronto. No dia 20 eu te aviso quando o adiantamento cair.'], next: 'teach' },
+        teach: {
+          say: ['Pra conferir: por que pagar R$ 550 no dia 20 ajuda, se a fatura já venceu?'],
+          simple: ['O que ficou sem pagar gera juros todo dia.', 'Se você paga R$ 550 no dia 20, o que acontece com esses juros?'],
+          opts: [['Os juros diminuem', 'tb_ok'], ['Não muda nada', 'tb_fix'], ['Tira o nome do Serasa', 'tb_fix']]
+        },
+        tb_fix: { say: ['Quase. Os juros correm por dia.', 'Pagar antes diminui os juros da próxima fatura.'], next: 'fim' },
+        sugerido: {
+          say: ['<b>R$ 370</b> é o máximo que dá hoje sem faltar até o dia 20.', 'R$ 1.620 na conta − R$ 1.200 de contas − R$ 50 de reserva.', 'No dia 20, quando o adiantamento cair, dá para pagar mais <b>R$ 550</b>.'],
+          opts: [['Ver os caminhos', 'caminhos'], ['Por que em 2 vezes?', 'porque2'], ['Agora não', 'fim']]
+        },
+        livre: {
+          say: ['Você ainda pode gastar uns <b>R$ 1.020</b> no cartão.', 'Mas tudo entra na próxima fatura, junto com o aluguel.', 'Só delivery e aplicativo somaram R$ 300 nesta fatura.'],
+          opts: [['Entendi', 'teach_livre'], ['Minha fatura de agora', 'fatura']]
+        },
+        historico: {
+          say: ['Em 2025 você pagou só uma parte ou o mínimo em <b>6 de 12</b> faturas.', 'Foi nos meses com gasto extra: material escolar e férias do Davi.', 'Dá para se preparar para esses meses.'],
+          opts: [['Pagar em 2 vezes?', 'sugerido'], ['Entendi', 'fim']]
+        },
+        evento: {
+          say: ['A geladeira quebrou e o conserto custa <b>R$ 70</b>. Refiz a conta.',
+                '<ul><li>Contas até o dia 20: de R$ 1.200 para <b>R$ 1.270</b></li><li>Pagar hoje: de R$ 370 para <b>R$ 297</b> (o mínimo)</li><li>No dia 20: continua <b>R$ 550</b></li><li>Dívida mês que vem: uns <b>R$ 1.290</b></li></ul>',
+                'A decisão é sua.'],
+          opts: [['Pagar R$ 297 + R$ 550', 'pagar_evento'], ['Agora não', 'fim']]
+        },
+        pagar_evento: { say: ['Fechado. Hoje: <b>R$ 297,00</b>. Dia 20: <b>R$ 550,00</b>.'], next: 'teach' },
+        fim: { say: ['Posso explicar outro valor?'], opts: [['Explicar outro valor', 'menu'], ['Fechar', '__close']] }
+      }
+    },
+
+    /* ================= JONAS · PJ / MEI ================= */
+    jonas: {
+      id: 'jonas', nome: 'Jonas Ferreira', curto: 'Jonas', ini: 'JF', cor: '#2F6FD1',
+      idade: 31, perfil: 'MEI', cidade: 'Belo Horizonte (MG)',
+      quote: '"Tem mês que entra bem, tem mês que não entra nada. O cartão segura as pontas."',
+      chips: ['Bem curto e informal', 'Conta só com o que é certo', 'Reserva maior'],
+      greet: null,
+      saldo: 2200,
+      renda: { label: 'Serviço confirmado', data: '22/10', valor: 600 },
+      final: '8807', fatura: 2760, venc: '18/out', limite: 4500, sugerido: 680,
+      insight: { titulo: 'Fiz a conta só com o que é certo', antes: 'Dá pra pagar', depois: 'da fatura sem apertar até dia 5.' },
+      hist: '7 de 12', histNote: 'Acompanha o trabalho: no verão paga tudo, no inverno aperta.',
+      evento: { titulo: 'O pneu do carro furou', texto: 'A troca custa R$ 220. Sem carro não tem trabalho. Veja como fica a conta.',
+        chip: 'O pneu furou (R$ 220)', minimo: 414, depois: 0,
+        pergunta: 'Pintou algum gasto fora do previsto? Escreve aqui embaixo o que foi e quanto custa. Tipo: “peça do carro, 300”.',
+        decisao: 'A decisão é sua.' },
+      objetivo: { titulo: 'Pensando em comprar algo?', texto: 'Ferramenta, peça, o que for. Eu vejo se cabe agora contando só com o que é certo.',
+        folga: 150, exemplo: 'Furadeira nova, 600', chip: 'Furadeira nova (R$ 600)',
+        pergunta: 'O que você quer comprar e quanto custa? Escreve aqui embaixo. Tipo: “furadeira, 600”.' },
+      extrato: [
+        ['10 de outubro', [['🔧', 'Pix recebido · Manutenção', 'Cliente', 450], ['📦', 'Material de refrigeração', 'Débito', -310]]],
+        ['05 de outubro', [['🏠', 'Aluguel (metade)', 'Pix', -750], ['👧', 'Pensão alimentícia', 'Pix', -400]]],
+        ['30 de setembro', [['❄️', 'Pix recebido · Instalação', 'Cliente', 900], ['⛽', 'Combustível', 'Débito', -150]]]
+      ],
+      menuOpts: [['Minha fatura', 'fatura'], ['Quanto posso pagar?', 'sugerido'], ['Meu saldo', 'saldo']],
+      flow: {
+        saldo: {
+          say: ['Você tem <b>R$ 2.200</b> na conta, MEI e pessoal juntos.', 'Até dia 5 entra <b>R$ 600</b> certo, do serviço do dia 22.', 'E saem uns <b>R$ 1.970</b> de contas. Sobram uns <b>R$ 830</b>.'],
+          opts: [['Quais contas?', 'essenciais'], ['E a fatura?', 'fatura'], ['E o serviço do dia 28?', 'renda']]
+        },
+        renda: {
+          say: ['Até dia 5, tem 2 serviços:', '<ul><li>✅ Dia 22: <b>R$ 600</b>, confirmado</li><li>⏳ Dia 28: <b>R$ 350</b>, a confirmar</li></ul>', 'Eu conto só o confirmado. O resto é bônus.'],
+          opts: [['Por quê?', 'teach'], ['Minha fatura', 'fatura'], ['Entendi', 'fim']]
+        },
+        fatura: {
+          say: ['Fala, Jonas. Sua fatura de <b>R$ 2.760</b> vence dia 18.', 'Até dia 5 você tem uns <b>R$ 1.970</b> de contas.', 'Quanto você tem de serviço <b>certo</b> até lá?'],
+          simple: ['<b>Serviço certo</b> é o que o cliente já confirmou, com dia marcado.', 'Somando esses serviços até dia 5, quanto dá mais ou menos?'],
+          opts: [['Até R$ 500', 'faixa_baixa'], ['R$ 500 a 1.000', 'caminhos'], ['Mais de R$ 1.000', 'faixa_alta'], ['Não sei', 'faixa_naosei']]
+        },
+        faixa_baixa: { say: ['Vi aqui um serviço confirmado de R$ 600 no dia 22. Vou contar com ele.'], next: 'caminhos' },
+        faixa_alta: { say: ['Só achei R$ 600 confirmados. Vou contar só com eles, pra não te deixar na mão.'], next: 'caminhos' },
+        faixa_naosei: { say: ['Tranquilo. Vou usar o que tá confirmado: R$ 600 no dia 22.'], next: 'caminhos' },
+        essenciais: {
+          say: ['Até dia 5:', '<ul><li>Aluguel: R$ 750</li><li>Pensão: R$ 400</li><li>Mercado: R$ 330</li><li>Combustível e material: R$ 250</li><li>Luz: R$ 90</li><li>DAS: R$ 86</li><li>Internet: R$ 60</li></ul>', 'Tá certo?'],
+          opts: [['Tá certo', 'caminhos'], ['Tenho mais um gasto', 'evento'], ['É menos', 'ess_menos']]
+        },
+        ess_menos: { say: ['Beleza. Mantive assim pra não te deixar na mão.'], next: 'caminhos' },
+        caminhos: {
+          say: ['Conto só com os R$ 600 do dia 22. Os R$ 350 do dia 28 ficam de bônus.',
+                card('good', '✅ Pagar R$ 680', 'Contas pagas e sobra reserva.'),
+                card('good', '➕ Se o dia 28 entrar: mais R$ 350', 'A dívida cai pra uns R$ 1.950.'),
+                card('warn', '⚠️ Só o mínimo (R$ 414)', 'Mês que vem a dívida fica em uns R$ 2.630.'),
+                card('bad', '❌ Pagar tudo', 'Faltam R$ 1.926 pras contas.')],
+          opts: [['Pagar R$ 680', 'pagar'], ['Ver a conta', 'conta'], ['Agora não', 'fim']]
+        },
+        conta: {
+          say: ['<ul><li>Na conta: <b>+R$ 2.200</b></li><li>Serviço dia 22: <b>+R$ 600</b></li><li>Contas até dia 5: <b>−R$ 1.966</b></li><li>Reserva: <b>−R$ 150</b></li></ul>', 'Dá uns <b>R$ 680</b>. A reserva é maior porque sua renda varia.'],
+          opts: [['Pagar R$ 680', 'pagar'], ['Só o mínimo', 'minimo']]
+        },
+        minimo: { say: ['Ok. Exato: <b>R$ 414,00</b>.', 'O que falta volta com juros.'], next: 'teach' },
+        pagar: {
+          say: ['Fechado. Exato: <b>R$ 680,00</b>.', 'Confirma na tela de pagamento.', 'Te aviso quando o Pix do dia 28 cair?'],
+          opts: [['Quero', 'aviso'], ['Não precisa', 'teach']]
+        },
+        aviso: { say: ['Beleza. Aviso quando cair, aí você decide se paga mais R$ 350.'], next: 'teach' },
+        teach: {
+          say: ['Pra conferir: por que eu não contei os R$ 350 do dia 28?'],
+          simple: ['O serviço do dia 28 ainda não foi confirmado pelo cliente.', 'Por que é melhor não contar com ele agora?'],
+          opts: [['Porque ainda não é certo', 'tb_ok'], ['Porque é pouco', 'tb_fix'], ['Esqueci', 'tb_fix']]
+        },
+        tb_fix: { say: ['Quase. Não contei porque ainda não é certo.', 'Se não entrar, você não fica na mão.'], next: 'fim' },
+        sugerido: {
+          say: ['<b>R$ 680</b> é o que dá sem apertar.', 'R$ 2.200 + R$ 600 do dia 22 − R$ 1.966 de contas − R$ 150 de reserva.', 'Se o dia 28 confirmar, dá mais R$ 350.'],
+          opts: [['Ver os caminhos', 'caminhos'], ['Por que reserva de R$ 150?', 'reserva'], ['Agora não', 'fim']]
+        },
+        reserva: {
+          say: ['Sua renda muda todo mês.', 'Pior mês recente: R$ 1.600. A reserva maior segura um mês fraco.'],
+          opts: [['Ver os caminhos', 'caminhos'], ['Entendi', 'fim']]
+        },
+        livre: {
+          say: ['Ainda dá <b>R$ 1.740</b> no cartão.', 'Mas vem tudo na próxima fatura. E o inverno é época fraca.'],
+          opts: [['Entendi', 'teach_livre'], ['Minha fatura', 'fatura']]
+        },
+        historico: {
+          say: ['Em 2025: parcial ou mínimo em <b>7 de 12</b> faturas.', 'Acompanha o trabalho: verão paga tudo, inverno aperta.', 'Vale guardar no verão pro inverno.'],
+          opts: [['Quanto posso pagar?', 'sugerido'], ['Entendi', 'fim']]
+        },
+        evento: {
+          say: ['Pneu furou: <b>R$ 220</b>. Sem carro não tem trabalho, então entra primeiro.',
+                '<ul><li>Pagar agora: de R$ 680 para <b>R$ 460</b></li><li>Dívida mês que vem: uns <b>R$ 2.580</b></li></ul>'],
+          opts: [['Pagar R$ 460', 'pagar_evento'], ['Agora não', 'fim']]
+        },
+        pagar_evento: { say: ['Fechado. Exato: <b>R$ 460,00</b>.'], next: 'teach' },
+        fim: { say: ['Mais alguma?'], opts: [['Explicar outro valor', 'menu'], ['Fechar', '__close']] }
+      }
+    }
+  };
+
+  // Nós que valem para todas as personas
+  function buildFlow(p) {
+    const f = Object.assign({
+      menu: {
+        say: ['Toque em qualquer valor com <b style="color:var(--orange)">✦</b> no app e eu explico de onde ele vem.', 'Ou escolha aqui:'],
+        opts: p.menuOpts
+      },
+      tb_ok: { say: ['Isso mesmo! 👏'], next: 'fim' },
+      teach_livre: {
+        say: ['Só pra conferir: se gastar esse limite todo, o que acontece?'],
+        opts: [['Vem na próxima fatura', 'tb_ok'], ['O banco paga', 'tb_livre_fix'], ['Não sei', 'tb_livre_fix']]
+      },
+      tb_livre_fix: { say: ['Quase! Tudo o que gastar vem na próxima fatura para pagar.'], next: 'fim' },
+      seguro: { say: ['Eu nunca peço senha e nunca mando link.', 'Se alguém pedir isso em meu nome, é golpe.'], next: 'fim' },
+      // imprevisto aberto: a pessoa conta o gasto dela e eu refaço a conta
+      imprevisto: {
+        say: [p.evento.pergunta, 'Ou toque no exemplo, se for parecido.'],
+        ask: 'gasto',
+        opts: [[p.evento.chip, 'evento'], ['Agora não', 'fim']]
+      },
+      // objetivo de compra: a pessoa conta o que quer comprar e eu vejo se cabe
+      objetivo: {
+        say: [p.objetivo.pergunta, 'Ou toque no exemplo.'],
+        ask: 'compra',
+        opts: [[p.objetivo.chip, '__compra_ex'], ['Agora não', 'fim']]
+      }
+    }, p.flow);
+    f.naoentendi = { say: ['Ainda não sei responder isso por texto.', 'Pode escolher uma das opções abaixo:'], opts: p.menuOpts };
+    return f;
+  }
+
+  let P = null, flow = {};
+
+  // Só acompanha o fim do chat se a pessoa já estiver lá embaixo; se ela arrastar pra cima, para de puxar
+  let stick = true, holding = false;
+  const atBottom = () => msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 40;
+  msgs.addEventListener('scroll', () => { if (!holding) stick = atBottom(); }, { passive: true });
+  // enquanto o dedo/mouse está no chat, ninguém puxa a tela pra baixo
+  msgs.addEventListener('touchstart', () => { holding = true; stick = false; }, { passive: true });
+  msgs.addEventListener('touchend', () => { holding = false; stick = atBottom(); }, { passive: true });
+  msgs.addEventListener('touchcancel', () => { holding = false; stick = atBottom(); }, { passive: true });
+  msgs.addEventListener('wheel', e => { if (e.deltaY < 0) stick = false; }, { passive: true });
+  // no mouse: clicar e arrastar rola o chat, como o dedo no celular
+  (() => {
+    let y0 = null, top0 = 0, moved = false, lastY = 0, lastT = 0, vel = 0, raf = 0;
+    msgs.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('button, a, input')) return;
+      cancelAnimationFrame(raf);
+      y0 = lastY = e.clientY; lastT = e.timeStamp; top0 = msgs.scrollTop; moved = false; vel = 0;
+      holding = true; stick = false;
+    });
+    window.addEventListener('pointermove', e => {
+      if (y0 === null) return;
+      const dy = e.clientY - y0;
+      if (!moved && Math.abs(dy) > 4) { moved = true; msgs.classList.add('dragging'); }
+      if (!moved) return;
+      msgs.scrollTop = top0 - dy;
+      const dt = e.timeStamp - lastT;
+      if (dt > 0) vel = Math.max(-3, Math.min(3, (lastY - e.clientY) / dt));
+      lastY = e.clientY; lastT = e.timeStamp;
+    });
+    window.addEventListener('pointerup', () => {
+      if (y0 === null) return;
+      y0 = null; msgs.classList.remove('dragging');
+      // embalo depois de soltar, como no celular
+      const glide = () => {
+        const before = msgs.scrollTop;
+        msgs.scrollTop += vel * 16; vel *= 0.94;
+        if (Math.abs(vel) < 0.02 || msgs.scrollTop === before) { holding = false; stick = atBottom(); return; }
+        raf = requestAnimationFrame(glide);
+      };
+      if (moved) glide(); else { holding = false; stick = atBottom(); }
+    });
+    msgs.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  })();
+  function scroll(force) { if (force) { stick = true; holding = false; } if (stick) msgs.scrollTop = msgs.scrollHeight; }
+  // Resposta estilo "assistente": texto corrido sem balão, digitado letra por letra
+  let answer = null;
+  function newAnswer() {
+    answer = document.createElement('div'); answer.className = 'answer';
+    msgs.appendChild(answer); return answer;
+  }
+  function typeInto(el, html, my, done) {
+    const tpl = document.createElement('template'); tpl.innerHTML = html;
+    const texts = [];
+    (function strip(n) {
+      [...n.childNodes].forEach(c => {
+        if (c.nodeType === 3) { texts.push([c, c.textContent]); c.textContent = ''; }
+        else strip(c);
+      });
+    })(tpl.content);
+    el.appendChild(tpl.content);
+    const caret = document.createElement('span'); caret.className = 'caret';
+    let t = 0, k = 0;
+    const tick = () => {
+      if (my !== runId) return;
+      if (t >= texts.length) { caret.remove(); done(); return; }
+      const [node, full] = texts[t];
+      k = Math.min(full.length, k + 1);
+      node.textContent = full.slice(0, k);
+      node.parentNode.insertBefore(caret, node.nextSibling);
+      if (k >= full.length) { t++; k = 0; }
+      scroll(); setTimeout(tick, 45);
+    };
+    tick();
+  }
+  function bubble(item, my, done) {
+    const el = document.createElement('div');
+    if (typeof item === 'string') {
+      el.className = 'para'; answer.appendChild(el); typeInto(el, item, my, done);
+    } else {
+      el.className = 'opt-card ' + item.card; answer.appendChild(el);
+      typeInto(el, '<strong>' + item.title + '</strong>' + item.body, my, done);
+    }
+  }
+  function userSays(text) {
+    answer = null;
+    const d = document.createElement('div'); d.className = 'msg me'; d.textContent = text;
+    msgs.appendChild(d); scroll(true);
+  }
+  function setQuick(opts) {
+    quick.innerHTML = ''; quick.scrollLeft = 0;
+    (opts || []).forEach(([label, next]) => {
+      const b = document.createElement('button'); b.textContent = label;
+      b.onclick = () => { userSays(label); run(next); };
+      quick.appendChild(b);
+    });
+    scroll();
+  }
+
+  let runId = 0, lastOpts = null, lastKey = null, awaiting = null;
+  function run(key, cont, prefix) {
+    if (key === '__close') { closeChat(); return; }
+    if (key === '__audio') { speakLast(); return; }
+    if (key === '__compra_ex') { simularCompra(P.objetivo.exemplo); return; }
+    awaiting = null;
+    let node = flow[key] || flow.menu;
+    if (key === '__repeat' && flow[lastKey]) {
+      // "não entendi": explica de outro jeito e repete as mesmas opções
+      const n = flow[lastKey];
+      node = { say: ['Sem problema, vou explicar de outro jeito.'].concat(n.simple || n.say), opts: n.opts };
+    } else if (key === 'naoentendi' && lastOpts) {
+      node = { say: flow.naoentendi.say, opts: lastOpts };
+    }
+    const say = prefix ? [prefix].concat(node.say) : node.say;
+    const my = ++runId;
+    quick.innerHTML = '';
+    if (!cont || !answer) newAnswer();
+    let i = 0;
+    const step = () => {
+      if (my !== runId) return;
+      if (i >= say.length) {
+        if (node.next) run(node.next, true);
+        else {
+          addActions(answer); lastOpts = node.opts; if (flow[key]) lastKey = key; setQuick(node.opts);
+          awaiting = node.ask || null;
+          const inp = document.getElementById('input');
+          inp.placeholder = awaiting === 'compra' ? 'O que quer comprar e quanto custa?'
+            : awaiting ? 'O que foi e quanto custa?' : 'Pergunte sobre esse valor...';
+          if (awaiting) inp.focus({ preventScroll: true });
+        }
+        return;
+      }
+      bubble(say[i++], my, () => setTimeout(step, 180));
+    };
+    setTimeout(step, 300);
+  }
+
+  // texto da resposta sem os botões de ação
+  function answerText(el) {
+    return [...el.children].filter(c => !c.classList.contains('msg-actions'))
+      .map(c => c.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean).join(' \n');
+  }
+
+  // Leitura em voz alta: um único áudio por vez; o botão da resposta que está tocando fica marcado
+  let speakingBtn = null, speakId = 0;
+
+  // Escolhe a voz pt-BR mais natural do aparelho (vozes neurais/online soam bem menos robóticas)
+  let bestVoice = null;
+  function pickVoice() {
+    try {
+      const vs = speechSynthesis.getVoices().filter(v => /^pt[-_]BR/i.test(v.lang));
+      const score = v =>
+        (/natural|neural/i.test(v.name) ? 8 : 0) +
+        (/online/i.test(v.name) ? 3 : 0) +
+        (/google/i.test(v.name) ? 5 : 0) +
+        (/enhanced|premium|aprimorad/i.test(v.name) ? 4 : 0) +
+        (/francisca|thalita|luciana|fernanda/i.test(v.name) ? 1 : 0) +
+        (/maria|daniel|compact|espeak/i.test(v.name) ? -4 : 0);
+      bestVoice = vs.sort((a, b) => score(b) - score(a))[0] || null;
+    } catch (e) {}
+  }
+  try { pickVoice(); speechSynthesis.addEventListener('voiceschanged', pickVoice); } catch (e) {}
+
+  // Deixa o texto com cara de fala: tira emojis/símbolos e escreve valores como se fala
+  function toSpeech(text) {
+    return text
+      .replace(/R\$\s*([\d.]+),00\b/g, '$1 reais')
+      .replace(/R\$\s*([\d.]+),(\d{2})\b/g, '$1 reais e $2 centavos')
+      .replace(/R\$\s*([\d.]+)/g, '$1 reais')
+      .replace(/(\d)\s*x\b/gi, '$1 vezes')
+      .replace(/\bPix\b/g, 'pix')
+      .replace(/[•→←↑↓·|]/g, ', ')
+      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '')
+      .replace(/\s*\n\s*/g, '. ')
+      .replace(/([.!?])\s*\./g, '$1')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  function stopSpeaking() {
+    speakId++;
+    try { speechSynthesis.cancel(); } catch (e) {}
+    if (speakingBtn) { speakingBtn.setAttribute('aria-pressed', 'false'); speakingBtn.setAttribute('aria-label', 'Ouvir esta resposta'); }
+    speakingBtn = null;
+  }
+  function speak(text, btn) {
+    stopSpeaking();
+    const my = speakId;
+    try {
+      if (!bestVoice) pickVoice();
+      // Uma frase por vez: pausas mais naturais e evita o corte de falas longas no Chrome
+      const parts = toSpeech(text).match(/[^.!?;:]+[.!?;:]*/g) || [];
+      if (btn) { speakingBtn = btn; btn.setAttribute('aria-pressed', 'true'); btn.setAttribute('aria-label', 'Parar leitura'); }
+      const done = () => { if (my === speakId && speakingBtn === btn) stopSpeaking(); };
+      const next = i => {
+        if (my !== speakId) return;
+        const s = (parts[i] || '').trim();
+        if (!s) return i < parts.length ? next(i + 1) : done();
+        const u = new SpeechSynthesisUtterance(s);
+        u.lang = 'pt-BR';
+        if (bestVoice) u.voice = bestVoice;
+        u.rate = bestVoice && /natural|neural|google/i.test(bestVoice.name) ? 1.05 : 1;
+        u.pitch = 1;
+        u.onend = () => next(i + 1);
+        u.onerror = done;
+        speechSynthesis.speak(u);
+      };
+      next(0);
+    } catch (e) {}
+  }
+
+  // Curtir / não curtir / ouvir em cada resposta do Hausto
+  const ICON = {
+    up: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H3V10h4zm0 0 4-8a3 3 0 0 1 3 3v4h5.5a2 2 0 0 1 2 2.3l-1.4 8A2 2 0 0 1 18.1 21H7"/></svg>',
+    down: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 14V3h4v11h-4zm0 0-4 8a3 3 0 0 1-3-3v-4H4.5a2 2 0 0 1-2-2.3l1.4-8A2 2 0 0 1 5.9 3H17"/></svg>',
+    ouvir: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>'
+  };
+  function addActions(el) {
+    if (!el || el.classList.contains('audio-note') || el.querySelector('.msg-actions')) return;
+    const bar = document.createElement('div'); bar.className = 'msg-actions';
+    bar.innerHTML =
+      '<button type="button" class="like" aria-pressed="false" aria-label="Gostei da resposta" title="Gostei">' + ICON.up + '</button>' +
+      '<button type="button" class="dislike" aria-pressed="false" aria-label="Não gostei da resposta" title="Não gostei">' + ICON.down + '</button>' +
+      '<button type="button" class="ouvir" aria-pressed="false" aria-label="Ouvir esta resposta" title="Ouvir">' + ICON.ouvir + '</button>' +
+      '<span class="thanks" role="status"></span>';
+    const [like, dislike, ouvir] = bar.querySelectorAll('button');
+    const thanks = bar.querySelector('.thanks');
+    ouvir.onclick = () => ouvir === speakingBtn ? stopSpeaking() : speak(answerText(el), ouvir);
+    const vote = (btn, other) => {
+      const on = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', on); other.setAttribute('aria-pressed', 'false');
+      thanks.textContent = on ? 'Obrigado pelo retorno!' : '';
+    };
+    like.onclick = () => vote(like, dislike);
+    dislike.onclick = () => vote(dislike, like);
+    el.appendChild(bar); scroll();
+  }
+
+  // "Ouvir em áudio": lê a última resposta em voz alta (pensado para a persona INSS)
+  function speakLast() {
+    const all = msgs.querySelectorAll('.answer:not(.audio-note)');
+    const last = all[all.length - 1];
+    const btn = last && last.querySelector('.msg-actions .ouvir');
+    speak(last ? answerText(last) : '', btn);
+    const my = ++runId;
+    newAnswer().classList.add('audio-note');
+    bubble('🔊 Lendo em voz alta...', my, () => setQuick(lastOpts));
+  }
+
+  // texto livre: tenta achar o assunto; se não, volta para os botões
+  function route(text) {
+    const s = text.toLowerCase();
+    if (/n[aã]o entendi|como assim|explica melhor|o que (seria|significa|quer dizer)|o que (é|e) isso/.test(s)) return '__repeat';
+    if (/senha|link|golpe/.test(s)) return 'seguro';
+    if (/rem[eé]dio|geladeira|pneu|imprevisto|conta nova|gasto novo/.test(s)) return 'evento';
+    if (/quanto (posso|d[aá])|sugerid|pagar/.test(s)) return 'sugerido';
+    if (/fatura|m[ií]nimo|vence/.test(s)) return 'fatura';
+    if (/limite|cart[aã]o/.test(s)) return 'livre';
+    if (/sal[aá]rio|benef[ií]cio|adiantamento|servi[cç]o|renda|inss/.test(s)) return 'renda';
+    if (/hist[oó]rico|2025/.test(s)) return 'historico';
+    if (/saldo|conta/.test(s)) return 'saldo';
+    return null;
+  }
+
+  // Imprevisto contado pela pessoa: tira o valor do texto e refaz a conta com os números da persona
+  let gastoDesc = '';
+  const IMPREVISTO = /rem[eé]dio|geladeira|pneu|imprevisto|conta nova|gasto|quebr|conserto|dentista|m[eé]dico|carro|moto|exame/;
+  function parseValor(s) {
+    const m = s.match(/(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d{1,2}))?/);
+    return m ? parseFloat(m[1].replace(/\./g, '') + (m[2] ? '.' + m[2] : '')) : null;
+  }
+  function parseDesc(text) {
+    return text.replace(/r\$\s*/gi, '').replace(/(\d{1,3}(?:\.\d{3})+|\d+)(?:,\d{1,2})?/, '')
+      .replace(/\b(reais|real|conto|pila|custa|custou|custando)\b/gi, ' ')
+      .replace(/[,.;:!?\-–]+/g, ' ').replace(/\s{2,}/g, ' ').trim()
+      .replace(/^(de|por|uns|umas)\s+|\s+(de|por|uns|umas|por m[eê]s|no m[eê]s)$/gi, '').trim();
+  }
+  function simularGasto(text) {
+    const valor = parseValor(text);
+    const desc = parseDesc(text);
+    if (desc) gastoDesc = desc;
+    if (!valor) {
+      flow.__gasto = { say: ['Entendi' + (gastoDesc ? ': <b>' + gastoDesc + '</b>' : '') + '. E quanto custa, mais ou menos?'], ask: 'gasto', opts: [['Agora não', 'fim']] };
+      run('__gasto'); return;
+    }
+    const nome = gastoDesc ? gastoDesc.charAt(0).toUpperCase() + gastoDesc.slice(1) : 'Esse gasto';
+    const E = P.evento, r10 = v => Math.round(v / 10) * 10;
+    const antes = P.sugerido, livre = antes - valor, pagar = Math.max(livre, E.minimo);
+    const divida = r10((P.fatura - pagar - E.depois) * 1.12);
+    const linhas = ['<li>Dá para pagar agora: de ' + fmt(antes) + ' para <b>' + fmt(pagar) + '</b></li>'];
+    if (E.depois) linhas.push('<li>Depois: continua <b>' + fmt(E.depois) + '</b></li>');
+    linhas.push('<li>Dívida mês que vem: uns <b>' + fmt(divida) + '</b></li>');
+    const say = [nome + ': <b>' + fmt(valor) + '</b>. Esse gasto vem primeiro. Refiz a conta.', '<ul>' + linhas.join('') + '</ul>'];
+    if (livre < E.minimo) say.push('Com esse gasto, só cabe o mínimo sem deixar faltar para as contas. O que ficar faltando volta com juros.');
+    say.push(E.decisao);
+    const val = fmt(pagar).replace(',00', '');
+    flow.__gasto = { say, opts: [['Pagar ' + val, '__gasto_ok'], ['Simular outro gasto', 'imprevisto'], ['Agora não', 'fim']] };
+    flow.__gasto_ok = { say: ['Combinado. O valor exato é <b>' + fmt(pagar) + '</b>.'], next: 'teach' };
+    gastoDesc = ''; run('__gasto');
+  }
+
+  // Objetivo de compra: vê se cabe na sobra do mês, se dá para parcelar ou quanto tempo leva para juntar
+  let compraDesc = '';
+  function simularCompra(text) {
+    const valor = parseValor(text);
+    const desc = parseDesc(text).replace(/^(quero|queria|comprar|um|uma)\s+/gi, '').trim();
+    if (desc) compraDesc = desc;
+    if (!valor) {
+      flow.__compra = { say: ['Entendi' + (compraDesc ? ': <b>' + compraDesc + '</b>' : '') + '. E quanto custa, mais ou menos?'], ask: 'compra', opts: [['Agora não', 'fim']] };
+      run('__compra'); return;
+    }
+    const nome = compraDesc ? compraDesc.charAt(0).toUpperCase() + compraDesc.slice(1) : 'Essa compra';
+    const folga = P.objetivo.folga, divida = P.fatura - P.sugerido;
+    const meses = Math.ceil(valor / folga);
+    // menor número de parcelas que cabe na sobra do mês (até 12x)
+    let nx = 0;
+    for (let n = 2; n <= 12; n++) if (valor / n <= folga) { nx = n; break; }
+    const say = [nome + ': <b>' + fmt(valor) + '</b>. Fiz a conta com o que sobra por mês depois das contas e da fatura: uns <b>' + fmt(folga) + '</b>.'];
+    let opts;
+    if (valor <= folga) {
+      say.push(card('good', '✅ Dá para comprar', 'Cabe na sobra deste mês, no Pix ou no débito. Só que a sobra do mês fica em ' + fmt(folga - valor) + '.'));
+      say.push(card('warn', '⚠️ Evite passar no cartão', 'O cartão já tem ' + fmt(divida) + ' que vão ficar sem pagar e geram juros.'));
+      opts = [['Simular outra compra', 'objetivo'], ['Agora não', 'fim']];
+    } else {
+      say.push('Hoje não cabe sem apertar. Veja os caminhos:');
+      say.push(card('good', '✅ Juntar ' + fmt(folga) + ' por mês', 'Em ' + meses + (meses > 1 ? ' meses' : ' mês') + ' dá para comprar à vista, sem juros e sem mexer na fatura.'));
+      if (nx) say.push(card('warn', '⚠️ Parcelar em ' + nx + 'x de ' + fmt(valor / nx), 'A parcela cabe, mas ocupa toda a sobra do mês por ' + nx + ' meses. E o cartão já tem ' + fmt(divida) + ' com juros.'));
+      say.push(card('bad', '❌ Comprar agora no cartão, de uma vez', 'A próxima fatura sobe para uns ' + fmt(divida + valor) + '. Não dá para pagar e vira mais juros.'));
+      opts = [['Me lembra de guardar', '__guardar'], ['Simular outra compra', 'objetivo'], ['Agora não', 'fim']];
+      flow.__guardar = { say: ['Combinado. Quando o dinheiro cair, eu lembro de separar <b>' + fmt(folga) + '</b> para ' + (compraDesc || 'essa compra') + '.', 'Em ' + meses + (meses > 1 ? ' meses' : ' mês') + ' ' + (P.id === 'maria' ? 'a senhora compra' : 'você compra') + ' à vista.'], next: 'fim' };
+    }
+    say.push(P.evento.decisao);
+    flow.__compra = { say, opts };
+    compraDesc = ''; run('__compra');
+  }
+
+  function send(e) {
+    e.preventDefault();
+    const i = document.getElementById('input'); const v = i.value.trim();
+    if (!v) return;
+    userSays(v); i.value = '';
+    const s = v.toLowerCase();
+    if (awaiting === 'compra') { simularCompra(v); return; }
+    if (awaiting === 'gasto' || (IMPREVISTO.test(s) && parseValor(s))) { simularGasto(v); return; }
+    run(route(v) || 'naoentendi');
+  }
+
+  // abrir / fechar / tamanho
+  let greeted = false;
+  function openChat(topic, label, value) {
+    sheet.classList.remove('full'); updateSizeBtn();
+    phone.classList.add('open');
+    {
+      // toda abertura começa uma conversa nova
+      runId++; stopSpeaking(); msgs.innerHTML = ''; stick = true; quick.innerHTML = '';
+      greeted = true;
+    }
+    if (label) {
+      const c = document.createElement('div'); c.className = 'ctx';
+      c.innerHTML = '<span>' + label + '</span><b>' + value + '</b>';
+      msgs.appendChild(c);
+      userSays('Por que esse valor?');
+    }
+    run(topic || 'menu', false, P && P.greet);
+  }
+  function closeChat() { phone.classList.remove('open'); runId++; stopSpeaking(); }
+  function toggleSize() { sheet.classList.toggle('full'); updateSizeBtn(); }
+  function updateSizeBtn() {
+    const full = sheet.classList.contains('full');
+    sizeBtn.innerHTML = full ? ICON_SHRINK : ICON_EXPAND;
+    sizeBtn.setAttribute('aria-label', full ? 'Diminuir tela' : 'Aumentar tela');
+  }
+  updateSizeBtn();
+
+  // arrastar pela alça: para cima aumenta, para baixo diminui / fecha
+  (function drag() {
+    const top = document.getElementById('sheetTop');
+    let y0 = null, dy = 0;
+    top.addEventListener('pointerdown', e => {
+      if (e.target.closest('button')) return;
+      y0 = e.clientY; dy = 0; sheet.classList.add('dragging'); top.setPointerCapture(e.pointerId);
+    });
+    top.addEventListener('pointermove', e => {
+      if (y0 === null) return;
+      dy = e.clientY - y0;
+      if (dy > 0) sheet.style.transform = 'translateY(' + dy + 'px)';
+    });
+    const end = () => {
+      if (y0 === null) return;
+      y0 = null; sheet.classList.remove('dragging'); sheet.style.transform = '';
+      const full = sheet.classList.contains('full');
+      if (dy < -40 && !full) toggleSize();
+      else if (dy > 60) full ? toggleSize() : closeChat();
+    };
+    top.addEventListener('pointerup', end);
+    top.addEventListener('pointercancel', end);
+  })();
+
+  // valores clicáveis → chat
+  function openFromValue(el) {
+    openChat(el.dataset.explain, el.dataset.label, el.dataset.v);
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-explain]');
+    if (!el) return;
+    e.preventDefault(); e.stopPropagation();
+    openFromValue(el);
+  }, true);
+  document.addEventListener('keydown', e => {
+    const el = e.target.closest && e.target.closest('[data-explain]');
+    if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openFromValue(el); }
+  });
+
+  // ---- aplica a persona no app ----
+  const $id = id => document.getElementById(id);
+  function setVal(el, text) {
+    el.dataset.v = text;
+    el.textContent = hidden ? '••••' : text;
+    el.classList.toggle('hidden-val', hidden);
+  }
+  function applyPersona(id) {
+    P = PERSONAS[id]; flow = buildFlow(P);
+    phone.classList.remove('p-maria', 'p-carla', 'p-jonas'); phone.classList.add('p-' + id);
+    $id('avatar').textContent = P.ini;
+
+    $id('insight').style.display = '';
+    $id('insTitle').textContent = P.insight.titulo;
+    $id('insText').innerHTML = P.insight.antes + ' <b class="money explain" data-explain="sugerido" data-label="Pagamento sugerido" role="button" tabindex="0"></b> ' + P.insight.depois;
+    setVal($id('insText').querySelector('.money'), fmt(P.sugerido));
+
+    setVal($id('vSaldo'), fmt(P.saldo));
+    renderAiTip();
+
+    $id('cardName').textContent = 'Cartão Múltiplo final ' + P.final;
+    setVal($id('vFatura'), fmt(P.fatura));
+    $id('faturaBar').style.width = Math.round(P.fatura / P.limite * 100) + '%';
+    $id('vencTxt').textContent = 'Vence em ' + P.venc;
+    setVal($id('vLivre'), fmt(P.limite - P.fatura));
+
+    $id('extratoList').innerHTML = P.extrato.map(([dia, itens]) =>
+      '<div class="section-title">' + dia + '</div><div class="list">' + itens.map(([ic, nome, sub, v]) => {
+        const txt = (v > 0 ? '+' : '') + fmt(v);
+        return '<div class="tx"><div class="cat">' + ic + '</div><div class="info"><b>' + nome + '</b><small>' + sub + '</small></div>' +
+          '<div class="val money' + (v > 0 ? ' in' : '') + (hidden ? ' hidden-val' : '') + '" data-v="' + txt + '">' + (hidden ? '••••' : txt) + '</div></div>';
+      }).join('') + '</div>').join('');
+
+    $id('evTitle').textContent = P.evento.titulo;
+    $id('evText').textContent = P.evento.texto;
+    $id('objTitle').textContent = P.objetivo.titulo;
+    $id('objText').textContent = P.objetivo.texto;
+    go('home');
+  }
+
+  // ---- Dica do Hausto: quanto pagar da fatura hoje (o chat explica o porquê) ----
+  function renderAiTip() {
+    const tip = $id('aiTip');
+    const tudo = P.saldo >= P.fatura;
+    const valor = fmt(tudo ? P.fatura : P.sugerido);
+    const abrir = () => tudo ? openChat('fatura') : openChat('sugerido', 'Dica: pagar hoje', valor);
+
+    tip.className = 'ai-tip ' + (tudo ? 'good' : 'warn');
+    $id('aiLbl').textContent = tudo ? 'Dá pra pagar tudo' : 'Não pague tudo agora';
+    setVal($id('aiPay'), valor);
+    tip.onclick = abrir;
+    tip.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); } };
+  }
+  // Para testar o cenário positivo no console: simularSaldo(3500)
+  window.simularSaldo = v => { P.saldo = v; setVal($id('vSaldo'), fmt(v)); renderAiTip(); };
+
+  // ---- onboarding: escolha da persona ----
+  let pick = null;
+  const CHECK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
+  $id('onbList').innerHTML = Object.values(PERSONAS).map(p =>
+    '<button class="persona" data-id="' + p.id + '">' +
+      '<div class="p-row"><div class="p-av" style="background:' + p.cor + '">' + p.ini + '</div>' +
+      '<div class="p-who"><div class="p-name">' + p.nome + '</div><div class="p-meta">' + p.idade + ' anos · ' + p.cidade + '</div></div>' +
+      '<span class="p-check">' + CHECK + '</span></div>' +
+      '<div class="p-quote">' + p.quote + '</div>' +
+      '<div class="p-chips"><span class="p-perfil">' + p.perfil + '</span>' + p.chips.map(c => '<span>' + c + '</span>').join('') + '</div>' +
+    '</button>').join('');
+  $id('onbList').addEventListener('click', e => {
+    const b = e.target.closest('.persona'); if (!b) return;
+    pick = b.dataset.id;
+    document.querySelectorAll('.persona').forEach(x => x.classList.toggle('sel', x === b));
+    $id('onbGo').disabled = false;
+    $id('onbGo').textContent = 'Entrar como ' + PERSONAS[pick].curto;
+  });
+  // carrosséis horizontais: no toque já rolam; no mouse, arrastar e roda do mouse
+  document.querySelectorAll('.of-row, .shortcuts').forEach(row => {
+    let x0 = null, left0 = 0, moved = false;
+    row.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse') return;
+      x0 = e.clientX; left0 = row.scrollLeft; moved = false;
+    });
+    window.addEventListener('pointermove', e => {
+      if (x0 === null) return;
+      const dx = e.clientX - x0;
+      if (!moved && Math.abs(dx) > 4) { moved = true; row.classList.add('dragging'); }
+      if (moved) row.scrollLeft = left0 - dx;
+    });
+    window.addEventListener('pointerup', () => {
+      if (x0 === null) return;
+      x0 = null; row.classList.remove('dragging');
+    });
+    // não dispara o clique do item quando a pessoa estava arrastando
+    row.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+    row.addEventListener('wheel', e => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      const max = row.scrollWidth - row.clientWidth;
+      if ((e.deltaY < 0 && row.scrollLeft <= 0) || (e.deltaY > 0 && row.scrollLeft >= max)) return;
+      e.preventDefault(); row.scrollLeft += e.deltaY;
+    }, { passive: false });
+  });
+  function startPersona() { if (!pick) return; applyPersona(pick); $id('onb').classList.add('hide'); }
+  function showOnboarding() { closeChat(); $id('onb').classList.remove('hide'); }
+</script>
+</body>
+</html>
